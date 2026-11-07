@@ -1,163 +1,137 @@
 (() => {
-  const $ = (s, r = document) => r.querySelector(s);
-  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const fine = matchMedia("(pointer: fine)").matches;
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  history.scrollRestoration = "manual";
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  scrollTo(0, 0);
   let lang = localStorage.getItem("lang") || ((navigator.language || "en").toLowerCase().startsWith("tr") ? "tr" : "en");
+  const C = () => CONTENT[lang];
+  const logo = (s, cls = "") => `<span class="${cls}"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span>`;
+  const smooth = sel => { const t = $(sel); t && t.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); };
 
-  /* ---------- i18n render ---------- */
-  const t = () => I18N[lang];
-  const get = (obj, path) => path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const fmt = n => n.toLocaleString(lang === "tr" ? "tr-TR" : "en-US");
+  /* theme */
+  const root = document.documentElement;
+  root.dataset.theme = localStorage.getItem("theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  $("#theme").addEventListener("click", () => { root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark"; localStorage.setItem("theme", root.dataset.theme); });
 
-  function render() {
-    document.documentElement.lang = lang;
-    $$("[data-i18n]").forEach(el => { const v = get(t(), el.dataset.i18n); if (typeof v === "string") el.textContent = v; });
-    $$(".lang button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
-
-    $("#kpis").innerHTML = t().kpis.map(k => `
-      <div class="kpi"><div class="v" data-count="${k.v}" data-prefix="${esc(k.prefix)}" data-suffix="${esc(k.suffix)}">${esc(k.prefix)}0<small>${esc(k.suffix)}</small></div>
-      <div class="l">${esc(k.label)}</div><div class="s">${esc(k.sub)}</div></div>`).join("");
-
-    $("#tllist").innerHTML = t().timeline.map(e => `
-      <li><div class="meta"><span class="y">${esc(e.y)}</span><span class="tag ${/now|şimdi/i.test(e.tag) ? "now" : ""}">${esc(e.tag)}</span></div>
-      <h3>${esc(e.t)}</h3><p>${esc(e.d)}</p></li>`).join("");
-
-    $("#grid").innerHTML = t().projects.map(p => `
-      <article class="card"><div class="top"><div><h3>${esc(p.n)}</h3><div class="k">${esc(p.k)}</div></div><span class="badge">${esc(p.badge)}</span></div>
-      <p>${esc(p.d)}</p><div class="tags">${p.tags.map(x => `<span>${esc(x)}</span>`).join("")}</div></article>`).join("");
-
-    $("#stackgrid").innerHTML = t().stack_groups.map(g => `<div class="sg"><h4>${esc(g.h)}</h4><ul>${g.items.map(i => `<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
-    const all = t().stack_groups.flatMap(g => g.items);
-    $("#marquee").innerHTML = [...all, ...all].map(i => `<span>${esc(i)}</span>`).join("");
-
-    const r = t().receipt, tl = t().timeline;
-    $("#receipt").innerHTML = `<div class="c"><b>${esc(r.title)}</b><br>${esc(r.line1)}<br>${esc(r.line2)}</div><hr>
-      ${tl.slice().reverse().map(e => `<div class="row"><span>${esc(e.y)}</span><span>${esc(e.t.split(" — ")[0])}</span></div>`).join("")}
-      <hr><div class="row"><b>${esc(r.total)}</b><b>${esc(r.total_v)}</b></div><hr><div class="c">${esc(r.thanks)}</div><div class="bar"></div>`;
-
-    $("#year").textContent = new Date().getFullYear();
-    observe(); countersSeen = new WeakSet(); bindCards();
+  /* headline rotator */
+  let hlTimer, hlIdx = 0;
+  function setHeadline(i, animate = true) {
+    const lines = C().headlines; hlIdx = (i + lines.length) % lines.length; const h = $("#hl");
+    const swap = () => { h.textContent = lines[hlIdx]; h.classList.remove("is-fading"); $$(".hl-dot").forEach((d, k) => d.classList.toggle("on", k === hlIdx)); };
+    if (animate && !reduced) { h.classList.add("is-fading"); setTimeout(swap, 350); } else swap();
+  }
+  function startHeadlines() {
+    clearInterval(hlTimer);
+    $("#hldots").innerHTML = C().headlines.map((_, k) => `<button class="hl-dot" aria-label="Line ${k + 1}"></button>`).join("");
+    $$(".hl-dot").forEach((d, k) => d.addEventListener("click", () => { setHeadline(k); restart(); }));
+    setHeadline(hlIdx, false);
+    const restart = () => { clearInterval(hlTimer); if (!reduced) hlTimer = setInterval(() => setHeadline(hlIdx + 1), 5200); };
+    restart();
   }
 
-  $$(".lang button").forEach(b => b.addEventListener("click", () => {
-    if (b.dataset.lang === lang) return;
-    lang = b.dataset.lang; localStorage.setItem("lang", lang);
-    document.body.classList.add("switching");
-    setTimeout(() => { render(); requestAnimationFrame(() => document.body.classList.remove("switching")); }, 180);
-  }));
+  /* route */
+  const DESK = [[.07,.56],[.215,.32],[.36,.6],[.5,.3],[.64,.62],[.785,.34],[.93,.56]];
+  const MOB  = [[.26,.06],[.74,.19],[.26,.33],[.74,.47],[.26,.61],[.74,.75],[.5,.91]];
+  const pts = () => innerWidth <= 1000 ? MOB : DESK;
+  function pathD(P, w, h) {
+    const p = P.map(([x, y]) => [x * w, y * h]); let d = `M ${p[0][0]} ${p[0][1]}`;
+    for (let i = 1; i < p.length; i++) { const [x0, y0] = p[i - 1], [x1, y1] = p[i], cx = (x0 + x1) / 2; d += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1} ${y1}`; }
+    return d;
+  }
+  function layoutRoute(animate) {
+    const route = $("#route"), w = route.clientWidth, h = route.clientHeight, P = pts();
+    $("#routeSvg").setAttribute("viewBox", `0 0 ${w} ${h}`);
+    const d = pathD(P, w, h), rp = $("#routePath"); rp.setAttribute("d", d); $("#routeGhost").setAttribute("d", d);
+    const len = rp.getTotalLength(); rp.style.strokeDasharray = len; rp.style.strokeDashoffset = animate && !reduced ? len : 0;
+    $$(".stop").forEach((el, i) => { el.style.left = P[i][0] * 100 + "%"; el.style.top = P[i][1] * 100 + "%"; });
+    if (animate && !reduced) {
+      rp.style.transition = "none"; requestAnimationFrame(() => { rp.style.transition = "stroke-dashoffset 2.2s cubic-bezier(.3,0,.2,1)"; rp.style.strokeDashoffset = 0; });
+      $$(".stop").forEach((el, i) => setTimeout(() => el.classList.add("in"), 200 + i * 240));
+    } else $$(".stop").forEach(el => el.classList.add("in"));
+  }
+  function renderRoute() {
+    $("#stops").innerHTML = C().stops.map((s, i) => `<a class="stop ${i === C().stops.length - 1 ? "big" : ""}" href="#${s.id}" data-i="${i}">${logo(s, "disc")}<span class="lbl"><b>${esc(s.name)}</b><span class="yr">${esc(s.years)}</span></span></a>`).join("");
+    const tip = $("#tip");
+    $$(".stop").forEach(el => {
+      el.addEventListener("click", e => { e.preventDefault(); smooth(el.getAttribute("href")); });
+      el.addEventListener("pointerenter", () => { const s = C().stops[+el.dataset.i]; $("#tipK").textContent = s.kicker; $("#tipT").textContent = s.lead; tip.style.left = el.style.left; tip.style.top = `calc(${el.style.top} - 66px)`; tip.classList.add("show"); });
+      el.addEventListener("pointerleave", () => tip.classList.remove("show"));
+    });
+  }
 
-  /* ---------- reveal + counters ---------- */
-  let io, countersSeen = new WeakSet();
+  /* story */
+  const fig = (src, b, note) => `<figure class="fig card" data-full="assets/img/${src}"><div class="img"><img src="assets/img/${src}" alt="${esc(b)}" loading="lazy"></div><figcaption class="cap2"><b>${esc(b)}</b><span>${esc(note)}</span></figcaption></figure>`;
+  function renderStory() {
+    const ui = C().ui;
+    $("#storyList").innerHTML = C().stops.map((s, i) => `
+      <article class="stopsec" id="${s.id}">
+        <div class="bigyear" aria-hidden="true">${esc(s.years.split(/\s|–/)[0])}</div>
+        <aside class="side"><div class="reveal">${logo(s, "biglogo")}</div><div class="chap reveal"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="eyebrow">${esc(s.years)}</span></div></aside>
+        <div class="main">
+          <div class="reveal"><h2>${esc(s.name)}</h2><p class="kicker">${esc(s.kicker)}</p><p class="lead">${esc(s.lead)}</p><div class="body">${s.body.map(p => `<p>${esc(p)}</p>`).join("")}</div>
+          ${s.stats ? `<div class="stats">${s.stats.map(([b, l]) => `<div><b>${esc(b)}</b><span>${esc(l)}</span></div>`).join("")}</div>` : ""}</div>
+          ${s.internships ? `<p class="eyebrow sub-h reveal">${esc(ui.internships)}</p><div class="interns">${s.internships.map(x => `<div class="intern card"><span class="lg"><img src="assets/logos/${x.logo}" alt="${esc(x.name)}"></span><b>${esc(x.name)} — ${esc(x.role)}</b><span class="when">${esc(x.when)}</span><p>${esc(x.d)}</p></div>`).join("")}</div>` : ""}
+          ${s.press ? `<p class="eyebrow sub-h reveal">${esc(ui.press)}</p><div class="press">${s.press.map(p => fig(p.img, p.outlet, p.note)).join("")}</div>` : ""}
+          ${s.apps ? `<p class="eyebrow sub-h reveal">${esc(ui.apps)}</p><div class="apps">${s.apps.map(a => fig(a.img, "App Store", a.note)).join("")}</div>` : ""}
+          ${s.awards ? `<p class="eyebrow sub-h reveal">${esc(ui.awards)}</p><div class="awards">${s.awards.map(a => fig(a.img, "Amazon", a.note)).join("")}</div>` : ""}
+          ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot"><img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${esc(t.name)}</h4><p>${esc(t.d)}</p></div></div>`).join("")}</div>` : ""}
+          ${s.small ? `<p class="eyebrow sub-h reveal">${esc(s.small_title)}</p><p class="small-sub reveal">${esc(s.small_sub)}</p><div class="smalls">${s.small.map(t => `<div class="small card"><div class="row"><b>${esc(t.n)}</b><span class="mono">${esc(t.t)}</span></div><p>${esc(t.d)}</p></div>`).join("")}</div>` : ""}
+        </div>
+      </article>`).join("");
+    $("#wall").innerHTML = C().stops.map(s => `<img src="assets/logos/${s.logo}" alt="${esc(s.name)}" title="${esc(s.name)}">`).join("");
+    const me = C().me;
+    $$("[data-me]").forEach(el => el.textContent = me[el.dataset.me]);
+    $("#dutyFacts").innerHTML = C().duty_facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#langbars").innerHTML = me.langs.map(l => `<li><div class="row"><b>${esc(l[0])}</b><span>${esc(l[1])}</span></div><div class="bar"><i style="--w:${l[2]}%"></i></div></li>`).join("");
+    $("#certs").innerHTML = me.certs.map(c => `<li>${esc(c)}</li>`).join("");
+    $("#interests").innerHTML = me.interests.map(c => `<li>${esc(c)}</li>`).join("");
+    $("#langbars").classList.add("reveal"); $$(".fcol").forEach(f => f.classList.add("reveal"));
+  }
+
+  function render(first) {
+    document.documentElement.lang = lang;
+    $$("[data-ui]").forEach(el => { el.textContent = C().ui[el.dataset.ui] ?? ""; });
+    $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
+    renderRoute(); renderStory(); layoutRoute(first); startHeadlines();
+    $("#year").textContent = new Date().getFullYear();
+    observe(); bindLightbox();
+  }
+  $$(".seg button").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.lang === lang) return; lang = b.dataset.lang; localStorage.setItem("lang", lang);
+    $("main").classList.add("switching"); setTimeout(() => { render(false); requestAnimationFrame(() => $("main").classList.remove("switching")); }, 200);
+  }));
+  addEventListener("resize", () => layoutRoute(false));
+  $$(".dir a, .ctas a[href^='#']").forEach(l => l.addEventListener("click", e => { e.preventDefault(); smooth(l.getAttribute("href")); }));
+
+  /* reveal + scroll */
+  let io;
   function observe() {
     io && io.disconnect();
-    io = new IntersectionObserver(es => es.forEach(e => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add("in");
-      $$("[data-count]", e.target.closest(".kpis") || e.target).forEach(countUp);
-      if (e.target.matches(".kpi")) countUp($(".v", e.target));
-    }), { threshold: 0.15 });
-    $$(".reveal, .kpi, .card, .sg").forEach(el => { if (!el.classList.contains("reveal")) el.classList.add("reveal"); io.observe(el); });
+    io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("in")), { threshold: .1 });
+    $$(".interns, .press, .awards, .apps, .smalls, .tools-grid, .stats").forEach(g => [...g.children].forEach((c, i) => { c.classList.add("reveal"); c.style.setProperty("--rd", (i * .07) + "s"); }));
+    $$(".reveal").forEach(el => io.observe(el));
   }
-  function countUp(el) {
-    if (!el || countersSeen.has(el)) return; countersSeen.add(el);
-    const target = parseFloat(el.dataset.count), pre = el.dataset.prefix || "", suf = el.dataset.suffix || "";
-    const dec = String(target).includes(".") ? 1 : 0, dur = reduced ? 0 : 1400, t0 = performance.now();
-    const step = now => {
-      const p = Math.min(1, (now - t0) / (dur || 1)), e = 1 - Math.pow(1 - p, 3), v = target * e;
-      el.innerHTML = `${esc(pre)}${dec ? v.toFixed(dec).replace(".", lang === "tr" ? "," : ".") : fmt(Math.round(v))}<small>${esc(suf)}</small>`;
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
-
-  /* ---------- scroll: progress, nav, timeline rail ---------- */
-  const nav = $("#nav"), prog = $("#progress"), fill = $("#tlfill");
-  const links = $$(".links a");
+  const links = $$(".dir a");
   function onScroll() {
     const h = document.documentElement, max = h.scrollHeight - innerHeight;
-    prog.style.transform = `scaleX(${max ? h.scrollTop / max : 0})`;
-    nav.classList.toggle("scrolled", h.scrollTop > 20);
-    const tl = $("#tl"); if (tl) {
-      const r = tl.getBoundingClientRect(), p = Math.min(1, Math.max(0, (innerHeight * 0.7 - r.top) / r.height));
-      fill.style.transform = `scaleY(${p})`;
-      $$("#tllist li").forEach(li => { const b = li.getBoundingClientRect(); li.classList.toggle("lit", b.top < innerHeight * 0.72); });
-    }
-    let cur = "top"; $$("main section[id]").forEach(s => { if (s.getBoundingClientRect().top < innerHeight * 0.4) cur = s.id; });
-    links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + cur));
+    $("#progress").style.transform = `scaleX(${max ? h.scrollTop / max : 0})`;
+    let cur = -1; $$(".stopsec").forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * .5) cur = i; });
+    $$(".stop").forEach((el, i) => el.classList.toggle("lit", i === cur));
+    const sec = ["#facts", "#contact"].find(id => $(id).getBoundingClientRect().top < innerHeight * .5) || (cur >= 6 ? "#work" : cur >= 0 ? "#story" : "");
+    links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === sec));
   }
-  addEventListener("scroll", onScroll, { passive: true }); addEventListener("resize", onScroll);
+  addEventListener("scroll", onScroll, { passive: true });
 
-  /* ---------- pointer effects: cursor glow, spotlight, tilt, magnetic ---------- */
-  const cursor = $("#cursor");
-  if (fine && !reduced) {
-    document.body.classList.add("has-cursor");
-    let cx = innerWidth / 2, cy = innerHeight / 2, tx = cx, ty = cy;
-    addEventListener("pointermove", e => { tx = e.clientX; ty = e.clientY; });
-    (function loop() { cx += (tx - cx) * .12; cy += (ty - cy) * .12; cursor.style.transform = `translate(${cx - 180}px,${cy - 180}px)`; requestAnimationFrame(loop); })();
+  function bindLightbox() {
+    const lb = $("#lightbox"), img = $("img", lb);
+    $$(".fig").forEach(f => f.addEventListener("click", () => { img.src = f.dataset.full; lb.classList.add("open"); }));
+    lb.onclick = () => lb.classList.remove("open");
+    addEventListener("keydown", e => e.key === "Escape" && lb.classList.remove("open"));
   }
-  function bindCards() {
-    $$(".card, .kpi").forEach(el => {
-      el.addEventListener("pointermove", e => {
-        const r = el.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
-        el.style.setProperty("--mx", x + "px"); el.style.setProperty("--my", y + "px");
-        if (el.classList.contains("card") && fine && !reduced) {
-          const rx = ((y / r.height) - .5) * -6, ry = ((x / r.width) - .5) * 8;
-          el.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
-        }
-      });
-      el.addEventListener("pointerleave", () => { el.style.transform = ""; });
-    });
-  }
-  if (fine && !reduced) $$(".magnetic").forEach(b => {
-    b.addEventListener("pointermove", e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .18}px,${(e.clientY - r.top - r.height / 2) * .28}px)`; });
-    b.addEventListener("pointerleave", () => { b.style.transform = ""; });
-  });
+  const tick = () => { $("#clock").textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
+  tick(); setInterval(tick, 20000);
 
-  /* ---------- clock (Istanbul) ---------- */
-  const clock = $("#clock");
-  const tick = () => { clock.textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
-  tick(); setInterval(tick, 15000);
-
-  /* ---------- background: flowing gradient field + grid ---------- */
-  const cv = $("#bg"), ctx = cv.getContext("2d");
-  let W, H, px = 0, py = 0, tpx = 0, tpy = 0;
-  const blobs = [
-    { x: .2, y: .25, r: .45, c: [58, 123, 213], s: .00017, o: 0 },
-    { x: .8, y: .3, r: .40, c: [79, 209, 197], s: .00013, o: 2 },
-    { x: .55, y: .85, r: .50, c: [159, 122, 234], s: .00011, o: 4 },
-  ];
-  function size() { W = cv.width = innerWidth * devicePixelRatio; H = cv.height = innerHeight * devicePixelRatio; }
-  size(); addEventListener("resize", size);
-  addEventListener("pointermove", e => { tpx = (e.clientX / innerWidth - .5); tpy = (e.clientY / innerHeight - .5); });
-  function draw(now) {
-    px += (tpx - px) * .03; py += (tpy - py) * .03;
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = "#0b0e14"; ctx.fillRect(0, 0, W, H);
-    const sc = scrollY * 0.25 * devicePixelRatio;
-    ctx.globalCompositeOperation = "lighter";
-    blobs.forEach((b, i) => {
-      const x = (b.x + Math.sin(now * b.s + b.o) * .08 + px * .06 * (i + 1)) * W;
-      const y = (b.y + Math.cos(now * b.s * 1.3 + b.o) * .08 + py * .06 * (i + 1)) * H - sc * (i * .3 + .2);
-      const r = b.r * Math.max(W, H) * .9;
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, `rgba(${b.c.join(",")},.16)`); g.addColorStop(.5, `rgba(${b.c.join(",")},.05)`); g.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-    });
-    ctx.globalCompositeOperation = "source-over";
-    // fine grid, drifting with scroll
-    const step = 56 * devicePixelRatio, off = (sc * .4) % step;
-    ctx.strokeStyle = "rgba(255,255,255,.035)"; ctx.lineWidth = 1; ctx.beginPath();
-    for (let x = (W / 2) % step; x < W; x += step) { ctx.moveTo(x, 0); ctx.lineTo(x, H); }
-    for (let y = -off; y < H; y += step) { ctx.moveTo(0, y); ctx.lineTo(W, y); }
-    ctx.stroke();
-    // vignette
-    const v = ctx.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, Math.max(W, H) * .75);
-    v.addColorStop(0, "rgba(11,14,20,0)"); v.addColorStop(1, "rgba(11,14,20,.85)"); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
-    if (!reduced) requestAnimationFrame(draw);
-  }
-  requestAnimationFrame(draw);
-
-  render(); onScroll();
+  render(true); onScroll();
 })();
