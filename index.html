@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amir Maya — Marketplace consultant · builder</title>
+<meta name="description" content="Amir Maya. Strategic Account Services at Amazon Turkey; builder of Oculus, Parity TR and marketplace tooling. Previously co-founder of Hype-Merch.">
+<meta property="og:title" content="Amir Maya">
+<meta property="og:description" content="I grow sellers, then build the tools that do it at scale.">
+<meta property="og:url" content="https://amirmaya.com">
+<meta name="theme-color" content="#0b0e14">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="brand" href="#top"><span class="dot"></span>amirmaya<span class="tld">.com</span></a>
+  <nav class="links">
+    <a href="#top" data-i18n="nav.about">Overview</a>
+    <a href="#timeline" data-i18n="nav.timeline">Timeline</a>
+    <a href="#projects" data-i18n="nav.projects">Projects</a>
+    <a href="#stack" data-i18n="nav.stack">Toolbelt</a>
+    <a href="#contact" data-i18n="nav.contact">Contact</a>
+  </nav>
+  <div class="lang" role="group" aria-label="Language">
+    <button data-lang="en" class="on">EN</button><button data-lang="tr">TR</button>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="status reveal"><span class="pulse"></span><span data-i18n="status">Account health: Healthy</span><span class="mono" id="clock">--:--</span></div>
+    <p class="kicker reveal" data-i18n="hero_kicker">Marketplace consultant · builder</p>
+    <h1 class="reveal">
+      <span class="line" data-i18n="hero_title_1">I grow sellers,</span>
+      <span class="line grad" data-i18n="hero_title_2">then build the tools that do it at scale.</span>
+    </h1>
+    <p class="sub reveal" data-i18n="hero_sub"></p>
+    <div class="ctas reveal">
+      <a class="btn primary magnetic" href="#projects" data-i18n="cta_projects">See the work</a>
+      <a class="btn ghost magnetic" href="assets/Amir_Maya_CV.pdf" target="_blank" rel="noopener" data-i18n="cta_cv">Resume (PDF)</a>
+    </div>
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="section" id="timeline">
+    <div class="head reveal">
+      <p class="kicker" data-i18n="timeline_kicker"></p>
+      <h2 data-i18n="timeline_title"></h2>
+      <p class="sub" data-i18n="timeline_sub"></p>
+    </div>
+    <div class="tl" id="tl"><div class="rail"><div class="fill" id="tlfill"></div></div><ol id="tllist"></ol></div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <div class="head reveal">
+      <p class="kicker" data-i18n="projects_kicker"></p>
+      <h2 data-i18n="projects_title"></h2>
+      <p class="sub" data-i18n="projects_sub"></p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- STACK -->
+  <section class="section" id="stack">
+    <div class="head reveal">
+      <p class="kicker" data-i18n="stack_kicker"></p>
+      <h2 data-i18n="stack_title"></h2>
+    </div>
+    <div class="marquee reveal" aria-hidden="true"><div class="track" id="marquee"></div></div>
+    <div class="stackgrid" id="stackgrid"></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section contact" id="contact">
+    <div class="head reveal">
+      <p class="kicker" data-i18n="contact_kicker"></p>
+      <h2 data-i18n="contact_title"></h2>
+      <p class="sub" data-i18n="contact_sub"></p>
+      <div class="ctas">
+        <a class="btn primary magnetic" href="mailto:mayaamir96@gmail.com" data-i18n="contact_email">Email</a>
+        <a class="btn ghost magnetic" href="https://www.linkedin.com/in/amir-maya-a8460910b/" target="_blank" rel="noopener" data-i18n="contact_linkedin">LinkedIn</a>
+        <a class="btn ghost magnetic" href="assets/Amir_Maya_CV.pdf" target="_blank" rel="noopener" data-i18n="contact_cv">Download resume</a>
+      </div>
+    </div>
+    <aside class="receipt reveal" id="receipt"></aside>
+  </section>
+
+  <footer><span data-i18n="footer"></span><span class="mono">© <span id="year"></span></span></footer>
+</main>
+
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
