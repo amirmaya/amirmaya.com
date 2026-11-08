@@ -51,6 +51,9 @@ main{transition:opacity .22s}main.switching{opacity:0}
 .duty-name{font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-.02em;display:block}.duty-role{margin:2px 0 0;font-size:14px}.duty-where{margin:4px 0 0;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .duty-facts{margin:0;border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:8px}.duty-facts div{display:grid;grid-template-columns:64px 1fr;gap:12px;font-size:13px}.duty-facts dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:2px}.duty-facts dd{margin:0;color:var(--ink)}
 
+/* door counter */
+.door{display:flex;align-items:center;gap:22px;flex-wrap:wrap;opacity:.35;transition:opacity .6s}.door.ready{opacity:1}
+.dstat{display:flex;flex-direction:column;line-height:1.1}.dstat b{font-size:18px;font-weight:600;color:var(--ink);letter-spacing:.02em}.dstat span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 /* route */
 .route-head{display:flex;justify-content:space-between;align-items:center;padding:22px 0 6px}
 .route{position:relative;min-height:440px;margin:0 -10px 10px;color:var(--ink)}

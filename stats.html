@@ -1,0 +1,24 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>amirmaya.com — stats</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>body{margin:0;background:#F1F1EE;color:#121211;font:15px/1.5 Archivo,sans-serif;padding:40px 32px}.mono{font-family:"IBM Plex Mono",monospace}h1{font-size:28px;letter-spacing:-.03em;margin:0 0 4px}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#66665F}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border:1.5px solid #121211;margin:24px 0}
+.grid div{padding:16px 18px;border-right:1.5px solid #121211;border-bottom:1.5px solid #121211}.grid b{display:block;font-size:30px;letter-spacing:-.03em;line-height:1}.grid span{display:block;margin-top:6px}
+table{border-collapse:collapse;width:100%;max-width:720px;font-size:13px}td,th{border-bottom:1px solid #D9D9D3;padding:6px 8px;text-align:left}th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#66665F}
+.bar{height:8px;background:#121211}h2{font-size:16px;margin:32px 0 10px}.row{display:flex;gap:40px;flex-wrap:wrap}</style></head>
+<body><p class="eyebrow">amirmaya.com · door counter · private</p><h1>Visitors</h1><p class="eyebrow" id="meta"></p>
+<div class="grid" id="kpis"></div>
+<div class="row"><div><h2>Last 30 days</h2><table id="days"></table></div><div><h2>Countries (this month)</h2><table id="cc"></table><h2>Sections (this month)</h2><table id="sec"></table></div></div>
+<script>
+const key = new URLSearchParams(location.search).get("key") || localStorage.getItem("statskey"); if (key) localStorage.setItem("statskey", key);
+fetch("https://amirmaya-stats.mayaamir96.workers.dev/stats?key=" + encodeURIComponent(key || "")).then(r => r.json()).then(d => {
+  if (!d.mtd) { document.body.innerHTML = "<p>Unauthorized.</p>"; return; }
+  const dur = s => s == null ? "—" : `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+  document.getElementById("meta").textContent = "updated " + new Date().toLocaleString();
+  const k = [["Today", d.today, "unique visitors"], ["Online now", d.online, "sessions"], ["MTD", d.mtd.visitors, d.mtd.sessions + " sessions · " + d.mtd.views + " views"], ["YTD", d.ytd.visitors, d.ytd.sessions + " sessions"], ["All time", d.all.visitors, d.all.sessions + " sessions"], ["Avg visit", dur(d.avg_visit_all), "all time"]];
+  document.getElementById("kpis").innerHTML = k.map(([a, b, c]) => `<div><span class="eyebrow">${a}</span><b>${b}</b><span class="eyebrow">${c}</span></div>`).join("");
+  const mx = Math.max(1, ...d.series.map(x => x.visitors || 0));
+  document.getElementById("days").innerHTML = "<tr><th>Day</th><th>Visitors</th><th>Sessions</th><th>Views</th><th>Avg</th><th></th></tr>" + d.series.slice(-30).reverse().map(x => `<tr><td class="mono">${x.day}</td><td>${x.visitors||0}</td><td>${x.sessions||0}</td><td>${x.views||0}</td><td class="mono">${dur(x.dur_n ? Math.round(x.dur_sum/x.dur_n) : null)}</td><td style="width:160px"><div class="bar" style="width:${(x.visitors||0)/mx*100}%"></div></td></tr>`).join("");
+  const tbl = (o) => Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `<tr><td class="mono">${k}</td><td>${v}</td></tr>`).join("") || "<tr><td>—</td></tr>";
+  document.getElementById("cc").innerHTML = tbl(d.countries); document.getElementById("sec").innerHTML = tbl(d.sections);
+});
+</script></body></html>
