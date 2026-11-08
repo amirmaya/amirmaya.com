@@ -94,7 +94,7 @@
         <div><b>${esc(e.name)}</b><span class="eyebrow">${esc(e.years)} · ${esc(e.kicker)}</span><p>${esc(e.lead)}</p>
         ${e.internships ? `<div class="edu-interns">${e.internships.map(x => `<span class="ei" title="${esc(x.d)}"><img src="assets/logos/${x.logo}" alt=""><span><b>${esc(x.name)}</b> ${esc(x.role)} · ${esc(x.when)}</span></span>`).join("")}</div>` : ""}</div></div>`).join("");
     $("#langbars").innerHTML = me.langs.map(l => `<li><div class="row"><b>${esc(l[0])}</b><span>${esc(l[1])}</span></div><div class="bar"><i style="--w:${l[2]}%"></i></div></li>`).join("");
-    $("#certs").innerHTML = me.certs.map(c => `<li>${esc(c)}</li>`).join("");
+    $("#certs").innerHTML = me.certs.map(c => `<li><a href="${esc(c.u)}" target="_blank" rel="noopener"><b>${esc(c.t)}</b><span class="eyebrow">${esc(c.o)} · ${esc(c.d)} ↗</span></a></li>`).join("");
     $("#interests").innerHTML = me.interests.map(c => `<li>${esc(c)}</li>`).join("");
     $("#langbars").classList.add("reveal"); $$(".fcol").forEach(f => f.classList.add("reveal"));
   }

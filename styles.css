@@ -123,7 +123,7 @@ main{transition:opacity .22s}main.switching{opacity:0}
 .facts-grid{display:grid;grid-template-columns:1fr 1.2fr .9fr;gap:40px;border-top:1.5px solid var(--line);padding-top:32px}
 .langbars{list-style:none;margin:0;padding:0;display:grid;gap:14px}.langbars .row{display:flex;justify-content:space-between;margin-bottom:6px;font-size:14px}.langbars .row b{color:var(--ink);font-weight:600}.langbars .row span{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .langbars .bar{height:6px;border:1.5px solid var(--line);overflow:hidden}.langbars .bar i{display:block;height:100%;background:var(--ink);width:0;transition:width 1.2s var(--ease)}.langbars.in .bar i{width:var(--w)}
-.plain{list-style:none;margin:0;padding:0;display:grid;gap:8px}.plain li{font-size:14px;padding-left:16px;position:relative}.plain li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;background:var(--accent)}
+.plain{list-style:none;margin:0;padding:0;display:grid;gap:8px}.plain li{font-size:14px;padding-left:16px;position:relative}.plain li a{display:block}.plain li a:hover b{color:var(--atext)}.plain li b{display:block;color:var(--ink);font-weight:600}.plain li .eyebrow{display:block;margin-top:2px}.plain li::before{content:"";position:absolute;left:0;top:9px;width:6px;height:6px;background:var(--accent)}
 .chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}.chips li{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1.5px solid var(--line);padding:7px 11px;color:var(--ink)}
 
 /* contact */
@@ -150,13 +150,12 @@ main{transition:opacity .22s}main.switching{opacity:0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal,.stop{opacity:1}.stop{transform:translate(-50%,-50%)}}
 
 /* ---- neural layer (remove body.neural to disable) ---- */
-#neural{position:fixed;inset:0 0 auto 0;z-index:0;pointer-events:none;opacity:.9}
+#neural{position:fixed;inset:0;z-index:0;pointer-events:none}
 body.neural main,body.neural .fascia{position:relative;z-index:1}
-body.neural .hero,body.neural .section{background:transparent}
-body.neural .duty,body.neural .card,body.neural .stats,body.neural .stop .disc,body.neural .biglogo,body.neural .tip{background:var(--surface)}
-body.neural .hero{background:linear-gradient(180deg,color-mix(in srgb,var(--paper) 55%,transparent),var(--paper) 85%)}
-body.neural .section{background:var(--paper)}
-.synapse{filter:drop-shadow(0 0 6px var(--accent))}
-/* headline: caret while a line is "typed" */
+body.neural .fascia{background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(6px)}
+body.neural .hero{background:transparent}
+body.neural .section,body.neural .site-footer{background:color-mix(in srgb,var(--paper) 78%,transparent);backdrop-filter:blur(2px)}
+body.neural .duty,body.neural .card,body.neural .stats,body.neural .stop .disc,body.neural .biglogo,body.neural .tip,body.neural .edu-item{background:var(--surface)}
+.synapse{filter:drop-shadow(0 0 8px var(--accent))}
 body.neural .hl::after{content:"";display:inline-block;width:.08em;height:.85em;background:var(--accent);margin-left:.06em;vertical-align:-.08em;animation:caret 1s steps(1) infinite}
 @keyframes caret{50%{opacity:0}}
