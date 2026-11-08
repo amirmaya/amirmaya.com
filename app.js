@@ -19,7 +19,12 @@
   let hlTimer, hlIdx = 0;
   function setHeadline(i, animate = true) {
     const lines = C().headlines; hlIdx = (i + lines.length) % lines.length; const h = $("#hl");
-    const swap = () => { h.textContent = lines[hlIdx]; h.classList.remove("is-fading"); $$(".hl-dot").forEach((d, k) => d.classList.toggle("on", k === hlIdx)); };
+    const dots = () => $$(".hl-dot").forEach((d, k) => d.classList.toggle("on", k === hlIdx));
+    if (document.body.classList.contains("neural") && !reduced) {
+      const txt = lines[hlIdx]; let i = 0; h.textContent = ""; dots(); clearInterval(h._tw);
+      h._tw = setInterval(() => { h.textContent = txt.slice(0, ++i); if (i >= txt.length) clearInterval(h._tw); }, 28); return;
+    }
+    const swap = () => { h.textContent = lines[hlIdx]; h.classList.remove("is-fading"); dots(); };
     if (animate && !reduced) { h.classList.add("is-fading"); setTimeout(swap, 350); } else swap();
   }
   function startHeadlines() {
@@ -32,8 +37,8 @@
   }
 
   /* route */
-  const DESK = [[.07,.56],[.215,.32],[.36,.6],[.5,.3],[.64,.62],[.785,.34],[.93,.56]];
-  const MOB  = [[.26,.06],[.74,.19],[.26,.33],[.74,.47],[.26,.61],[.74,.75],[.5,.91]];
+  const DESK = [[.09,.58],[.3,.32],[.5,.6],[.7,.32],[.91,.56]];
+  const MOB  = [[.26,.08],[.74,.28],[.26,.5],[.74,.7],[.5,.92]];
   const pts = () => innerWidth <= 1000 ? MOB : DESK;
   function pathD(P, w, h) {
     const p = P.map(([x, y]) => [x * w, y * h]); let d = `M ${p[0][0]} ${p[0][1]}`;
@@ -84,6 +89,10 @@
     const me = C().me;
     $$("[data-me]").forEach(el => el.textContent = me[el.dataset.me]);
     $("#dutyFacts").innerHTML = C().duty_facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#edu").innerHTML = C().education.map(e => `
+      <div class="edu-item card"><span class="lg"><img src="assets/logos/${e.logo}" alt="${esc(e.name)}"></span>
+        <div><b>${esc(e.name)}</b><span class="eyebrow">${esc(e.years)} · ${esc(e.kicker)}</span><p>${esc(e.lead)}</p>
+        ${e.internships ? `<div class="edu-interns">${e.internships.map(x => `<span class="ei" title="${esc(x.d)}"><img src="assets/logos/${x.logo}" alt=""><span><b>${esc(x.name)}</b> ${esc(x.role)} · ${esc(x.when)}</span></span>`).join("")}</div>` : ""}</div></div>`).join("");
     $("#langbars").innerHTML = me.langs.map(l => `<li><div class="row"><b>${esc(l[0])}</b><span>${esc(l[1])}</span></div><div class="bar"><i style="--w:${l[2]}%"></i></div></li>`).join("");
     $("#certs").innerHTML = me.certs.map(c => `<li>${esc(c)}</li>`).join("");
     $("#interests").innerHTML = me.interests.map(c => `<li>${esc(c)}</li>`).join("");
@@ -119,7 +128,7 @@
     $("#progress").style.transform = `scaleX(${max ? h.scrollTop / max : 0})`;
     let cur = -1; $$(".stopsec").forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * .5) cur = i; });
     $$(".stop").forEach((el, i) => el.classList.toggle("lit", i === cur));
-    const sec = ["#facts", "#contact"].find(id => $(id).getBoundingClientRect().top < innerHeight * .5) || (cur >= 6 ? "#work" : cur >= 0 ? "#story" : "");
+    const sec = ["#facts", "#contact"].find(id => $(id).getBoundingClientRect().top < innerHeight * .5) || (cur >= 4 ? "#work" : cur >= 0 ? "#story" : "");
     links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === sec));
   }
   addEventListener("scroll", onScroll, { passive: true });

@@ -12,7 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="neural">
 <div class="progress" id="progress"></div>
 
 <header class="fascia" id="nav">
@@ -78,6 +78,8 @@
   <section class="section facts" id="facts">
     <div class="wrap">
       <div class="section-head"><div><p class="eyebrow" data-ui="s3_eyebrow"></p><h2 class="section-title" data-ui="s3_title"></h2></div></div>
+      <p class="eyebrow" data-ui="education" style="margin:0 0 14px"></p>
+      <div class="edu" id="edu"></div>
       <div class="facts-grid">
         <div class="fcol"><p class="eyebrow" data-ui="langs"></p><ul class="langbars" id="langbars"></ul></div>
         <div class="fcol"><p class="eyebrow" data-ui="certs"></p><ul class="plain" id="certs"></ul></div>
@@ -97,6 +99,6 @@
 </main>
 
 <div class="lightbox" id="lightbox"><img alt=""><button aria-label="Close">×</button></div>
-<script src="content.js"></script><script src="app.js"></script><script src="counter.js" defer></script>
+<script src="content.js"></script><script src="app.js"></script><script src="counter.js" defer></script><script src="neural.js" defer></script>
 </body>
 </html>
