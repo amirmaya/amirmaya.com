@@ -18,19 +18,21 @@ window.Graph = (() => {
     // L2 tools & products
     const amz = C.stops.find(s => s.id === "amazon"), hm = C.stops.find(s => s.id === "hypemerch");
     (amz.tools || []).forEach((t, i) => { const id = "tool" + i; add({ id, layer: 2, type: "tool", label: t.name, logo: t.icon, data: { kicker: C.ui.tools, lead: t.d, img: t.img, blur: true }, size: 24 }); edges.push(["amazon", id]); });
-    (amz.small || []).forEach((t, i) => { const id = "small" + i; add({ id, layer: 2, type: "tool", label: t.n, data: { kicker: t.t, lead: t.d }, size: 13 }); edges.push(["amazon", id]); });
-    add({ id: "hm-app", layer: 2, type: "tool", label: "Hype-Merch app", data: { kicker: "App Store · 10 Sep 2023", lead: hm.body[1], imgs: (hm.apps || []).map(a => a.img) }, size: 18 }); edges.push(["hypemerch", "hm-app"]);
-    add({ id: "trn-bots", layer: 2, type: "tool", label: "TRNotify bots", data: { kicker: "Discord · 2020", lead: C.stops.find(s => s.id === "trnotify").lead }, size: 14 }); edges.push(["trnotify", "trn-bots"]);
+    const smallIcons = ["tiles/sweep.png","tiles/scraper.png","tiles/deleter.png","tiles/extractor.png","tiles/downloader.png"];
+    (amz.small || []).forEach((t, i) => { const id = "small" + i; add({ id, layer: 2, type: "tool", label: t.n, logo: smallIcons[i], data: { kicker: t.t, lead: t.d }, size: 17 }); edges.push(["amazon", id]); });
+    add({ id: "hm-app", layer: 2, type: "tool", label: "Hype-Merch app", logo: "tiles/app.png", data: { kicker: "App Store · 10 Sep 2023", lead: hm.body[1], imgs: (hm.apps || []).map(a => a.img) }, size: 18 }); edges.push(["hypemerch", "hm-app"]);
+    add({ id: "trn-bots", layer: 2, type: "tool", label: "TRNotify bots", logo: "tiles/bots.png", data: { kicker: "Discord · 2020", lead: C.stops.find(s => s.id === "trnotify").lead }, size: 14 }); edges.push(["trnotify", "trn-bots"]);
     // L3 proof
-    C.me.certs.forEach((c, i) => { const id = "cert" + i; add({ id, layer: 3, type: "cert", label: c.t, data: { kicker: c.o + " · " + c.d, lead: c.t, link: c.u }, size: 9 }); edges.push(["coursera", id]); });
-    (hm.press || []).forEach((p, i) => { const id = "press" + i; add({ id, layer: 3, type: "press", label: p.outlet, data: { kicker: C.ui.press, lead: p.note, img: p.img }, size: 14 }); edges.push(["hypemerch", id]); });
-    (amz.awards || []).forEach((a, i) => { const id = "award" + i; add({ id, layer: 3, type: "award", label: a.note, data: { kicker: C.ui.awards, lead: a.note, img: a.img }, size: 14 }); edges.push(["amazon", id]); });
+    const certIcon = o => /Michigan/.test(o) ? "tiles/umich.png" : /Google/.test(o) ? "tiles/google.png" : /MongoDB/.test(o) ? "tiles/mongodb.png" : "tiles/coursera.png";
+    C.me.certs.forEach((c, i) => { const id = "cert" + i; add({ id, layer: 3, type: "cert", label: c.t, logo: certIcon(c.o), data: { kicker: c.o + " · " + c.d, lead: c.t, link: c.u }, size: 12 }); edges.push(["coursera", id]); });
+    (hm.press || []).forEach((p, i) => { const id = "press" + i; add({ id, layer: 3, type: "press", label: p.outlet, logo: /Vogue/.test(p.outlet) ? "tiles/vogue.png" : /H\u00fcrriyet/.test(p.outlet) ? "tiles/hurriyet.png" : "tiles/press.png", data: { kicker: C.ui.press, lead: p.note, img: p.img }, size: 14 }); edges.push(["hypemerch", id]); });
+    (amz.awards || []).forEach((a, i) => { const id = "award" + i; add({ id, layer: 3, type: "award", label: a.note, logo: "tiles/award.png", data: { kicker: C.ui.awards, lead: a.note, img: a.img }, size: 14 }); edges.push(["amazon", id]); });
   }
 
   function layout() {
     const el = $("#graph"); W = el.clientWidth; H = el.clientHeight; const mobile = W < 760;
-    const cols = [0, 1, 2, 3]; const pad = mobile ? 24 : 70; const colX = i => pad + (W - 2 * pad) * (mobile ? i / 3 : [0.04, 0.3, 0.62, 0.96][i]);
-    cols.forEach(L => { const ns = nodes.filter(n => n.layer === L); const top = 56, bot = H - 24, step = (bot - top) / Math.max(1, ns.length - 1 || 1);
+    const cols = [0, 1, 2, 3]; const pad = mobile ? 24 : 70; const colX = i => pad + (W - 2 * pad) * (mobile ? [0.02, 0.3, 0.6, 0.78][i] : [0.03, 0.29, 0.56, 0.78][i]);
+    cols.forEach(L => { const ns = nodes.filter(n => n.layer === L); const top = 60, bot = H - 30, step = (bot - top) / Math.max(1, ns.length - 1 || 1);
       ns.forEach((n, i) => { n.x = colX(L); n.y = ns.length === 1 ? (top + bot) / 2 : top + i * step; }); });
     // career layer: spread with more room
     draw();

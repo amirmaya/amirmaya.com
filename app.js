@@ -89,6 +89,7 @@
     const me = C().me;
     $$("[data-me]").forEach(el => el.textContent = me[el.dataset.me]);
     $("#dutyFacts").innerHTML = C().duty_facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("");
+    $("#skills").innerHTML = me.skills.map(([k, v]) => `<div class="skill card"><b>${esc(k)}</b><p>${esc(v)}</p></div>`).join("");
     $("#edu").innerHTML = C().education.map(e => `
       <div class="edu-item card"><span class="lg"><img src="assets/logos/${e.logo}" alt="${esc(e.name)}"></span>
         <div><b>${esc(e.name)}</b><span class="eyebrow">${esc(e.years)} · ${esc(e.kicker)}</span><p>${esc(e.lead)}</p>
