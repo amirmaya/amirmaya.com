@@ -104,7 +104,7 @@
     document.documentElement.lang = lang;
     $$("[data-ui]").forEach(el => { el.textContent = C().ui[el.dataset.ui] ?? ""; });
     $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
-    renderStory(); Graph.mount(C(), lang); startHeadlines();
+    renderStory(); Graph.mount(C()); startHeadlines();
     $("#year").textContent = new Date().getFullYear();
     observe(); bindLightbox();
   }
