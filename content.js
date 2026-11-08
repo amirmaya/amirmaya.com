@@ -15,7 +15,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace consultant · builder", where: "Istanbul, Türkiye",
-          tagline: "I grow sellers for a living and build the tooling that does it at scale.",
+          tagline: "I'm Amir, a builder and lifelong learner. I built Hype Merch from the ground up and led product, operations, finance and growth; today I work with strategic sellers at Amazon, helping them grow. I care about understanding customers, communicating clearly, and turning ideas into action.",
           langs: [["Turkish","Native",100],["English","Native",100],["Hebrew","Intermediate",55],["Spanish","Beginner",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "University of Michigan", d: "Apr 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
@@ -29,8 +29,8 @@ window.CONTENT = {
             { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "" }
           ],
           interests: ["Tech & digital ecosystems","Financial markets & crypto","Competitive team sports","Sneakers & streetwear"],
-          glance: [["8 / 10","top Softlines sellers managed"],["117","account managers on Oculus"],["147K+","competitor sellers mapped"],["$3.1M","Hype-Merch GMV"]] },
-    headlines: ["Six years, five stops.", "I grow sellers. Then I build the tools.", "Sneaker bots → a marketplace → Amazon.", "Everything here has proof behind it."],
+          glance: [["8 / 10","top Softlines sellers managed"],["117","account managers on Oculus"],["147K+","competitor sellers mapped"],["200M+ TRY","Hype-Merch GMV"]] },
+    headlines: ["There's always a better way to do things.", "Built Hype Merch from the ground up: 200M+ TRY GMV, 40K+ sales, 55K users.", "Now at Amazon, growing strategic sellers in 3P Softlines.", "Product thinking, execution, and work that moves the needle."],
     duty_facts: [["Now", "Strategic Account Services, Amazon Turkey"], ["Focus", "Softlines · seller growth · internal tooling"], ["Speaks", "TR · EN · HE · ES"], ["Base", "Istanbul"]],
     ui: { story: "Story", facts: "Profile", role_short: "Marketplace consultant", eyebrow: "My career, laid out as a route · Istanbul", cta_story: "Walk the route", cv: "Resume (PDF)", duty: "Account manager on duty", live: "Available",
           route_eyebrow: "00 · Route · Five stops", door: "Live · Door counter", door_today: "visits today", door_now: "here now", door_avg: "average visit", door_note: "Anonymous · no cookies", s1_eyebrow: "01 · Story · Stop by stop", s1_title: "Stop by stop.", s1_intro: "Each stop is its own chapter: what I did there, what it taught me, and what I built because of it.",
@@ -52,8 +52,8 @@ window.CONTENT = {
         lead: "Real-time restock and raffle monitors for the Turkish sneaker market, delivered through Discord. Scrapers, monitors, alert bots.",
         body: ["First product, first paying community, first time code paid rent. It also showed where the real gap was: there was no proper place to trade what people were buying."] },
       { id: "hypemerch", years: "2020 – 2024", logo: "tiles/hypemerch.png", name: "Hype-Merch", kicker: "Co-founder · Product Owner · Turkey's first sneaker marketplace",
-        lead: "Built a sneaker and streetwear marketplace from zero to $3.1M GMV and 2,000+ active sellers.",
-        stats: [["$3.1M","GMV"],["2,000+","active sellers"],["Top 100","App Store Shopping"],["10 Sep 2023","app launch"]],
+        lead: "Built a sneaker and streetwear marketplace from zero to 200M+ TRY GMV, 40K+ sales and 55K users, leading product, operations, finance and growth.",
+        stats: [["200M+ TRY","GMV"],["40K+","sales"],["55K","users"],["Top 100","App Store Shopping"]],
         body: ["Owned the roadmap and the platform end to end: listing management, seller dashboards, payout distribution, shipping operations, API integrations, onboarding UX, internal automation.",
                "Mobile app launched 10 September 2023 and held Top 100–200 in App Store Shopping through 2023–24."],
         press: [
@@ -103,7 +103,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace danışmanı · builder", where: "İstanbul, Türkiye",
-          tagline: "İşim satıcı büyütmek; bunu ölçekte yapan araçları da ben kurarım.",
+          tagline: "Ben Amir; kuran ve öğrenmeyi bırakmayan biri. Hype Merch'i sıfırdan kurdum; ürün, operasyon, finans ve büyümeyi yönettim. Bugün Amazon'da stratejik satıcılarla çalışıyorum, büyümelerine yardım ediyorum. Müşteriyi anlamak, net iletişim ve fikri eyleme dönüştürmek benim için önemli.",
           langs: [["Türkçe","Ana dil",100],["İngilizce","Ana dil",100],["İbranice","Orta",55],["İspanyolca","Başlangıç",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "Michigan Üniversitesi", d: "Nis 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
@@ -117,8 +117,8 @@ window.CONTENT = {
             { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "" }
           ],
           interests: ["Teknoloji & dijital ekosistemler","Finansal piyasalar & kripto","Takım sporları","Sneaker & streetwear"],
-          glance: [["8 / 10","yönetilen en büyük Softlines satıcısı"],["117","Oculus kullanan hesap yöneticisi"],["147K+","haritalanan rakip satıcı"],["3,1 M$","Hype-Merch GMV"]] },
-    headlines: ["Altı yıl, beş durak.", "Satıcı büyütürüm. Sonra aracını yaparım.", "Sneaker botları → bir marketplace → Amazon.", "Buradaki her şeyin arkasında kanıt var."],
+          glance: [["8 / 10","yönetilen en büyük Softlines satıcısı"],["117","Oculus kullanan hesap yöneticisi"],["147K+","haritalanan rakip satıcı"],["200M+ TL","Hype-Merch GMV"]] },
+    headlines: ["Her işin daha iyi bir yolu vardır.", "Hype Merch'i sıfırdan kurdum: 200M+ TL GMV, 40K+ satış, 55K kullanıcı.", "Şimdi Amazon'da, 3P Softlines'ta stratejik satıcıları büyütüyorum.", "Ürün düşüncesi, icraat ve gerçekten fark yaratan işler."],
     duty_facts: [["Şimdi", "Strategic Account Services, Amazon Türkiye"], ["Odak", "Softlines · satıcı büyümesi · dahili araçlar"], ["Diller", "TR · EN · HE · ES"], ["Üs", "İstanbul"]],
     ui: { story: "Hikâye", facts: "Profil", role_short: "Marketplace danışmanı", eyebrow: "Kariyerim, bir rota olarak · İstanbul", cta_story: "Rotayı yürü", cv: "Özgeçmiş (PDF)", duty: "Nöbetçi hesap yöneticisi", live: "Müsait",
           route_eyebrow: "00 · Rota · Beş durak", door: "Canlı · Kapı sayacı", door_today: "bugün ziyaret", door_now: "şu an içeride", door_avg: "ortalama süre", door_note: "Anonim · çerez yok", s1_eyebrow: "01 · Hikâye · Durak durak", s1_title: "Durak durak.", s1_intro: "Her durak kendi bölümü: orada ne yaptım, bana ne öğretti, bu yüzden ne kurdum.",
@@ -140,8 +140,8 @@ window.CONTENT = {
         lead: "Türkiye sneaker pazarı için gerçek zamanlı stok ve çekiliş monitörleri, Discord üzerinden. Scraper'lar, monitörler, uyarı botları.",
         body: ["İlk ürün, ilk ödeyen topluluk, kodun ilk kez kira ödediği an. Asıl boşluğu da gösterdi: insanların aldığı şeyleri alıp satacağı düzgün bir yer yoktu."] },
       { id: "hypemerch", years: "2020 – 2024", logo: "tiles/hypemerch.png", name: "Hype-Merch", kicker: "Kurucu ortak · Product Owner · Türkiye'nin ilk sneaker pazarı",
-        lead: "Sneaker ve streetwear marketplace'ini sıfırdan 3,1 M$ GMV ve 2.000+ aktif satıcıya taşıdım.",
-        stats: [["3,1 M$","GMV"],["2.000+","aktif satıcı"],["Top 100","App Store Alışveriş"],["10 Eyl 2023","uygulama lansmanı"]],
+        lead: "Sneaker ve streetwear marketplace'ini sıfırdan 200M+ TL GMV, 40K+ satış ve 55K kullanıcıya taşıdım; ürün, operasyon, finans ve büyümeyi yönettim.",
+        stats: [["200M+ TL","GMV"],["40K+","satış"],["55K","kullanıcı"],["Top 100","App Store Alışveriş"]],
         body: ["Yol haritası ve platform uçtan uca bendeydi: listeleme yönetimi, satıcı panelleri, ödeme dağıtımı, kargo operasyonu, API entegrasyonları, onboarding deneyimi, dahili otomasyon.",
                "Mobil uygulama 10 Eylül 2023'te çıktı; 2023–24 boyunca App Store Alışveriş'te Top 100–200'de kaldı."],
         press: [

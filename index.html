@@ -31,8 +31,21 @@
     <div class="wrap hero-in">
       <div class="hero-top">
         <p class="eyebrow" data-ui="eyebrow"></p>
-        <div class="hl-wrap"><h1 class="hl" id="hl"></h1>
-          <div class="hl-dots" id="hldots"></div></div>
+        <div class="hl-wrap"><h1 class="hl" id="hl"></h1><div class="hl-dots" id="hldots"></div></div>
+      </div>
+      <div class="route-head"><span class="eyebrow" data-ui="route_eyebrow"></span>
+        <div class="door" id="door"><span class="live"><i></i><span data-ui="door"></span></span>
+          <span class="dstat"><b class="mono" data-k="today">0000</b><span data-ui="door_today"></span></span>
+          <span class="dstat"><b class="mono" data-k="online">1</b><span data-ui="door_now"></span></span>
+          <span class="dstat"><b class="mono" data-k="avg">—</b><span data-ui="door_avg"></span></span>
+          <span class="eyebrow dim" data-ui="door_note"></span></div></div>
+      <div class="route" id="route">
+        <svg class="route-svg" id="routeSvg" viewBox="0 0 1400 420" preserveAspectRatio="none" aria-hidden="true">
+          <path id="routeGhost" d="" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 8" opacity=".25"/>
+          <path id="routePath" d="" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="stops" id="stops"></div>
+        <div class="tip" id="tip"><span class="eyebrow" id="tipK"></span><span id="tipT"></span></div>
       </div>
       <div class="hero-body">
         <div class="hero-left">
@@ -47,22 +60,6 @@
           </div>
           <dl class="duty-facts" id="dutyFacts"></dl>
         </aside>
-      </div>
-    </div>
-    <div class="wrap">
-      <div class="route-head"><span class="eyebrow" data-ui="route_eyebrow"></span>
-        <div class="door" id="door"><span class="live"><i></i><span data-ui="door"></span></span>
-          <span class="dstat"><b class="mono" data-k="today">0000</b><span data-ui="door_today"></span></span>
-          <span class="dstat"><b class="mono" data-k="online">1</b><span data-ui="door_now"></span></span>
-          <span class="dstat"><b class="mono" data-k="avg">—</b><span data-ui="door_avg"></span></span>
-          <span class="eyebrow dim" data-ui="door_note"></span></div></div>
-      <div class="route" id="route">
-        <svg class="route-svg" id="routeSvg" viewBox="0 0 1400 420" preserveAspectRatio="none" aria-hidden="true">
-          <path id="routeGhost" d="" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 8" opacity=".25"/>
-          <path id="routePath" d="" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-        </svg>
-        <div class="stops" id="stops"></div>
-        <div class="tip" id="tip"><span class="eyebrow" id="tipK"></span><span id="tipT"></span></div>
       </div>
     </div>
   </section>
