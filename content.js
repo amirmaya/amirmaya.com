@@ -25,7 +25,8 @@ window.CONTENT = {
             { t: "Introduction to Programming in Swift 5", o: "LearnQuest", d: "Mar 2020", u: "https://www.coursera.org/account/accomplishments/verify/E54TXCHPNKSV" },
             { t: "Introduction to iOS App Development with Swift 5", o: "LearnQuest", d: "Mar 2020", u: "https://www.coursera.org/account/accomplishments/verify/XVK3NLCF2GPG" },
             { t: "Introduction to Git and GitHub", o: "Google", d: "2020", u: "https://www.coursera.org/account/accomplishments/certificate/42BV62KNFJGN" },
-            { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "https://www.coursera.org/account/accomplishments/certificate/96SGGMN8TYSU" }
+            { t: "RESTful API with HTTP and JavaScript", o: "Coursera Guided Project", d: "Sep 2020", u: "https://www.coursera.org/account/accomplishments/certificate/96SGGMN8TYSU" },
+            { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "" }
           ],
           interests: ["Tech & digital ecosystems","Financial markets & crypto","Competitive team sports","Sneakers & streetwear"],
           glance: [["8 / 10","top Softlines sellers managed"],["117","account managers on Oculus"],["147K+","competitor sellers mapped"],["$3.1M","Hype-Merch GMV"]] },
@@ -112,7 +113,8 @@ window.CONTENT = {
             { t: "Introduction to Programming in Swift 5", o: "LearnQuest", d: "Mar 2020", u: "https://www.coursera.org/account/accomplishments/verify/E54TXCHPNKSV" },
             { t: "Introduction to iOS App Development with Swift 5", o: "LearnQuest", d: "Mar 2020", u: "https://www.coursera.org/account/accomplishments/verify/XVK3NLCF2GPG" },
             { t: "Introduction to Git and GitHub", o: "Google", d: "2020", u: "https://www.coursera.org/account/accomplishments/certificate/42BV62KNFJGN" },
-            { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "https://www.coursera.org/account/accomplishments/certificate/96SGGMN8TYSU" }
+            { t: "RESTful API with HTTP and JavaScript", o: "Coursera Guided Project", d: "Sep 2020", u: "https://www.coursera.org/account/accomplishments/certificate/96SGGMN8TYSU" },
+            { t: "MongoDB Basics", o: "MongoDB University", d: "2020", u: "" }
           ],
           interests: ["Teknoloji & dijital ekosistemler","Finansal piyasalar & kripto","Takım sporları","Sneaker & streetwear"],
           glance: [["8 / 10","yönetilen en büyük Softlines satıcısı"],["117","Oculus kullanan hesap yöneticisi"],["147K+","haritalanan rakip satıcı"],["3,1 M$","Hype-Merch GMV"]] },
