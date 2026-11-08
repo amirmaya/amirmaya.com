@@ -17,7 +17,7 @@ window.Graph = (() => {
     edges.push(["bilgi", "deloitte"]);
     // L2 tools & products
     const amz = C.stops.find(s => s.id === "amazon"), hm = C.stops.find(s => s.id === "hypemerch");
-    (amz.tools || []).forEach((t, i) => { const id = "tool" + i; add({ id, layer: 2, type: "tool", label: t.name, data: { kicker: C.ui.tools, lead: t.d, img: t.img, blur: true }, size: 20 }); edges.push(["amazon", id]); });
+    (amz.tools || []).forEach((t, i) => { const id = "tool" + i; add({ id, layer: 2, type: "tool", label: t.name, logo: t.icon, data: { kicker: C.ui.tools, lead: t.d, img: t.img, blur: true }, size: 24 }); edges.push(["amazon", id]); });
     (amz.small || []).forEach((t, i) => { const id = "small" + i; add({ id, layer: 2, type: "tool", label: t.n, data: { kicker: t.t, lead: t.d }, size: 13 }); edges.push(["amazon", id]); });
     add({ id: "hm-app", layer: 2, type: "tool", label: "Hype-Merch app", data: { kicker: "App Store · 10 Sep 2023", lead: hm.body[1], imgs: (hm.apps || []).map(a => a.img) }, size: 18 }); edges.push(["hypemerch", "hm-app"]);
     add({ id: "trn-bots", layer: 2, type: "tool", label: "TRNotify bots", data: { kicker: "Discord · 2020", lead: C.stops.find(s => s.id === "trnotify").lead }, size: 14 }); edges.push(["trnotify", "trn-bots"]);

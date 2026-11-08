@@ -12,8 +12,8 @@ export default {
       "access-control-allow-headers": "content-type", "cache-control": "no-store", "content-type": "application/json" };
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
     const origin = req.headers.get("origin") || "";
-    if (origin && !/^https:\/\/(www\.)?amirmaya\.com$|^http:\/\/127\.0\.0\.1:8765$/.test(origin)) return new Response("{}", { status: 403, headers: cors });
-    if (origin.startsWith("http://127.0.0.1")) cors["access-control-allow-origin"] = origin;
+    if (origin && !/^https?:\/\/(www\.)?amirmaya\.com$|^http:\/\/127\.0\.0\.1:8765$/.test(origin)) return new Response("{}", { status: 403, headers: cors });
+    if (origin) cors["access-control-allow-origin"] = origin;
 
     const now = new Date(); const day = now.toISOString().slice(0, 10); const month = day.slice(0, 7); const year = day.slice(0, 4);
     const ip = req.headers.get("cf-connecting-ip") || "0"; const ua = req.headers.get("user-agent") || "";

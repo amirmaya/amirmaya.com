@@ -81,7 +81,7 @@
           ${s.press ? `<p class="eyebrow sub-h reveal">${esc(ui.press)}</p><div class="press">${s.press.map(p => fig(p.img, p.outlet, p.note)).join("")}</div>` : ""}
           ${s.apps ? `<p class="eyebrow sub-h reveal">${esc(ui.apps)}</p><div class="apps">${s.apps.map(a => fig(a.img, "App Store", a.note)).join("")}</div>` : ""}
           ${s.awards ? `<p class="eyebrow sub-h reveal">${esc(ui.awards)}</p><div class="awards">${s.awards.map(a => fig(a.img, "Amazon", a.note)).join("")}</div>` : ""}
-          ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot"><img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${esc(t.name)}</h4><p>${esc(t.d)}</p></div></div>`).join("")}</div>` : ""}
+          ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot">${t.icon ? `<img class="ticon" src="assets/logos/${t.icon}" alt="">` : ""}<img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${esc(t.name)}</h4><p>${esc(t.d)}</p></div></div>`).join("")}</div>` : ""}
           ${s.small ? `<p class="eyebrow sub-h reveal">${esc(s.small_title)}</p><p class="small-sub reveal">${esc(s.small_sub)}</p><div class="smalls">${s.small.map(t => `<div class="small card"><div class="row"><b>${esc(t.n)}</b><span class="mono">${esc(t.t)}</span></div><p>${esc(t.d)}</p></div>`).join("")}</div>` : ""}
         </div>
       </article>`).join("");
