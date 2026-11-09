@@ -6,7 +6,7 @@ body{background:radial-gradient(1200px 700px at 72% 18%,#0e1526 0%,var(--paper) 
 .btn{border-width:1px}.btn:hover{box-shadow:none;border-color:var(--accent);color:var(--ink)}.btn-ink:hover{background:var(--accent);border-color:var(--accent);color:var(--onink);box-shadow:none}
 .seg,.theme{border-width:1px}.dir a:hover,.dir a.active{border-color:var(--line)}
 /* hero = exactly one screen: fixed header height as top padding, two columns, brain stage fills the right column */
-.hero.v3{border-bottom:1px solid var(--line);height:100vh;min-height:560px;display:grid;grid-template-rows:minmax(0,1fr);padding:72px 0 12px;overflow:hidden}
+.hero.v3{height:100vh;min-height:560px;display:grid;grid-template-rows:minmax(0,1fr);padding:72px 0 12px;overflow:hidden}
 .hero-grid{display:grid;grid-template-columns:minmax(360px,40%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;gap:0;min-height:0;max-width:1500px;margin:0 auto;width:100%}
 .copy{display:flex;flex-direction:column;justify-content:center;gap:var(--gap);width:100%;max-width:520px;justify-self:center;padding:0 32px;min-height:0}
 .copy>*{flex:0 0 auto}
@@ -25,7 +25,7 @@ h1 .caret{display:inline-block;width:.07em;height:.85em;background:var(--accent)
 .neuron .lbl{text-align:center;line-height:1.25;white-space:nowrap}.neuron .lbl b{display:block;color:var(--ink);font-size:12px;font-weight:700}.neuron .lbl span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted)}
 .brain .tip{position:absolute;z-index:4;pointer-events:none;background:#0b0f19;border:1px solid var(--line);color:var(--ink2);padding:12px 14px;width:300px;font-size:13px;line-height:1.5;opacity:0;transform:translate(-50%,-100%) translateY(-10px);transition:opacity .2s,transform .25s;box-shadow:0 20px 50px -20px #000}
 .brain .tip .eyebrow{display:block;margin-bottom:4px;color:var(--accent)}.brain .tip.show{opacity:1;transform:translate(-50%,-100%) translateY(-16px)}
-.legend{position:absolute;left:50%;transform:translateX(-50%);bottom:4px;display:flex;gap:18px;white-space:nowrap}.legend .eyebrow{display:flex;align-items:center;gap:8px}.legend i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}.legend i.b{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+.legend{position:absolute;left:16px;bottom:8px;display:flex;gap:18px;white-space:nowrap}.legend .eyebrow{display:flex;align-items:center;gap:8px}.legend i{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}.legend i.b{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
 /* visitor counter lives on the brain stage as a telemetry readout (top-right); legend sits bottom-centre */
 .hud{position:absolute;top:10px;right:14px;z-index:5;display:inline-flex;align-items:stretch;border:1px solid var(--line);background:rgba(13,18,32,.72);backdrop-filter:blur(8px);font-family:var(--mono);box-shadow:0 10px 30px -18px rgba(46,230,197,.35)}
 .hud>*{display:flex;flex-direction:row;align-items:baseline;gap:6px;padding:6px 10px;border-right:1px solid var(--line);min-width:0}.hud>*:last-child{border-right:0}
@@ -76,7 +76,7 @@ body.brain-open{overflow:hidden}body.brain-open .fascia,body.brain-open .progres
 .neuron{transition:opacity .4s}
 .apps{grid-template-columns:repeat(2,minmax(0,230px))}@media (max-width:620px){.apps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .fig .cap2{flex-wrap:wrap}.fig .cap2 span{min-width:0}
-.legend{max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center;white-space:normal}
+.legend{max-width:calc(50% - 34px);flex-wrap:wrap;justify-content:flex-start;white-space:normal;line-height:1.5}
 @media (max-width:980px){.legend .dim{display:none}}
 
 /* ---- wow layer ---- */
@@ -145,8 +145,8 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
 .copy{transition:visibility 0s}body.brain-open .copy{visibility:hidden;transition:visibility 0s .6s}
 /* ===== story as a spine: one glowing cord runs down the section, each chapter is a neuron on it, its text a hologram panel ===== */
 #storyList{position:relative;padding-top:8px}
-#storyList::before{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,transparent,var(--accent) 4%,var(--accent) 96%,transparent);opacity:.28;box-shadow:0 0 14px var(--accent)}
-#storyList::after{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:repeating-linear-gradient(180deg,var(--accent) 0 5px,transparent 5px 21px);opacity:.55;mask:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent);-webkit-mask:linear-gradient(180deg,transparent,#000 4%,#000 96%,transparent)}
+#storyList::before{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent) 96%,transparent);opacity:.28;box-shadow:0 0 14px var(--accent)}
+#storyList::after{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:repeating-linear-gradient(180deg,var(--accent) 0 5px,transparent 5px 21px);opacity:.55;mask:linear-gradient(180deg,#000,#000 96%,transparent);-webkit-mask:linear-gradient(180deg,#000,#000 96%,transparent)}
 .stopsec{grid-template-columns:200px minmax(0,1fr);gap:56px;padding:40px 0 72px;border-top:0}
 .stopsec::before{content:"";position:absolute;left:42px;top:0;width:4px;height:72px;border-radius:2px;background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 12px var(--accent);opacity:0;animation:spinePulse 5.2s linear infinite;animation-delay:calc(var(--i,0) * .9s)}
 @keyframes spinePulse{0%{transform:translateY(-72px);opacity:0}6%{opacity:.9}40%{transform:translateY(100%);opacity:.9}46%,100%{transform:translateY(100%);opacity:0}}
@@ -166,3 +166,8 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
 @media (max-width:1000px){#storyList::before,#storyList::after{left:28px}.stopsec::before{left:27px}.stopsec{grid-template-columns:minmax(0,1fr);gap:18px;padding:32px 0 48px}
   .stopsec .side{flex-direction:row;align-items:center}.stopsec .side>.reveal:first-child{width:56px;height:56px}.stopsec .biglogo{width:56px;height:56px}.stopsec .side>.reveal:first-child::after{display:none}
   .stopsec .main{padding:18px 18px 20px;margin-left:0}.stopsec h2{font-size:24px}.stopsec .lead{font-size:17px}}
+/* cord between the hero and the spine: same two-layer stroke as the spine (soft glow + vertebra dashes) */
+#story{position:relative}.cord{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible;z-index:0}
+.cord path{fill:none;stroke:var(--accent);stroke-width:2}.cord .c1{opacity:.28;filter:drop-shadow(0 0 7px var(--accent))}.cord .c2{opacity:.55;stroke-dasharray:5 16;stroke-linecap:round}
+#story .wrap{position:relative;z-index:1}#story .section-head{max-width:min(820px,54vw)}
+@media (max-width:980px){.cord{display:none}#story .section-head{max-width:none}}

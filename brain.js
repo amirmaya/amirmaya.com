@@ -208,6 +208,11 @@
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
     for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
+    if (focus === null && W > 980) {                                   // brain stem: the cord leaves the brain and runs off the bottom of the stage into the story spine
+      const b0 = project({ x: 0, y: -.12, z: 0 }), ym = (b0.Y + H) / 2; ctx.save(); ctx.lineCap = "round";
+      const path = () => { ctx.beginPath(); ctx.moveTo(b0.X, b0.Y); ctx.bezierCurveTo(b0.X, ym, cX, ym, cX, H + 4); };
+      path(); ctx.strokeStyle = "rgba(46,230,197,.28)"; ctx.lineWidth = 2; ctx.shadowColor = "rgba(46,230,197,.9)"; ctx.shadowBlur = 14; ctx.stroke(); ctx.shadowBlur = 0;
+      path(); ctx.strokeStyle = "rgba(46,230,197,.55)"; ctx.setLineDash([5, 16]); ctx.lineDashOffset = -((t * 22) % 21); ctx.stroke(); ctx.setLineDash([]); ctx.restore(); }
     if (!reduced && focus === null) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
