@@ -21,13 +21,13 @@
     const nodes = (s.nodes || []).map(x => ({ k: s.name, t: x.n, val: x.v, sl: x.n, d: x.d }));
     if (id === "amazon") return [...stats,
       ...(s.tools || []).map(t => ({ k: c.ui.tools, t: t.name, logo: t.icon, d: t.d, img: t.img, blur: true })),
-      { k: s.small_title, t: ui().g_desktop || "Desktop tools", val: String((s.small || []).length), sl: ui().g_desktop || "Desktop tools", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d]) },
+      { k: s.small_title, t: ui().g_desktop || "Desktop tools", logo: "tiles/sweep.png", sl: ui().g_desktop || "Desktop tools", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d, x.i]) },
       ...(s.awards || []).map(a => ({ k: c.ui.awards, t: a.note, img: a.img, d: a.note })) ];
     if (id === "hypemerch") return [...stats,
       ...(s.press || []).map(p => ({ k: c.ui.press, t: p.outlet, img: p.img, d: p.note })),
       { k: "App Store", t: "Hype-Merch app", img: (s.apps || [{}])[0].img, d: s.body[1], imgs: (s.apps || []).map(a => a.img) } ];
     if (id === "coursera") return c.me.certs.map(x => ({ k: x.o, t: x.t, logo: certIcon(x.o), d: x.d, link: x.u }));
-    if (id === "trnotify") return [...stats, { k: "Discord · 2020", t: ui().g_bots || "Discord bots", logo: "tiles/bots.png", d: s.lead }];
+    if (id === "trnotify") return [...stats, { k: "Discord", t: ui().g_bots || "Discord bots", logo: "tiles/bots.png", d: ui().bots_d || s.lead }];
     return [...stats, ...nodes];
   }
 
@@ -253,7 +253,7 @@
     const d = $("#holoDetail"), u = ui();
     const imgs = k.imgs || (k.img ? [k.img] : []);
     d.innerHTML = `<button class="hd-close" aria-label="Close">×</button><span class="eyebrow">${esc(k.k)}</span><b>${esc(k.t)}</b><p>${esc(k.d || "")}</p>
-      ${k.list ? `<ul>${k.list.map(([a, b2]) => `<li><b>${esc(a)}</b> ${esc(b2)}</li>`).join("")}</ul>` : ""}
+      ${k.list ? `<ul class="hd-list">${k.list.map(([a, b2, ic]) => `<li>${ic ? `<span class="li-ic"><img src="assets/logos/${ic}" alt=""></span>` : ""}<div><b>${esc(a)}</b> ${esc(b2)}</div></li>`).join("")}</ul>` : ""}
       ${imgs.length ? `<div class="hd-imgs">${imgs.map(i => `<img src="assets/img/${i}" alt="" data-full="assets/img/${i}">`).join("")}</div>` : ""}
       ${k.blur ? `<span class="eyebrow">${esc(u.blur_note)}</span>` : ""}${k.link ? `<a class="btn" target="_blank" rel="noopener" href="${esc(k.link)}">${esc(u.g_verify)} ↗</a>` : ""}`;
     d.classList.add("on"); $(".hd-close", d).onclick = () => { d.innerHTML = `<p class="holo-empty">${esc(u.v3_pick)}</p>`; $$(".sat, .chip").forEach(x => x.classList.remove("on")); };

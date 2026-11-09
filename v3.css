@@ -238,3 +238,9 @@ body.gal-open{overflow:hidden}
   .duty-facts div:nth-child(n+4){display:none}.photo{width:52px;height:52px}
   .stopsec .main{padding:16px}.stopsec h2{font-size:22px}.stopsec .lead{font-size:16px}.tool .txt{padding:16px}
 }
+/* small tools and panel lists: icon in the same round frame as every other node */
+.small .row{align-items:center;gap:12px}.small .row .lg{width:40px;height:40px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,95,85,.55);background:#0b0f19;flex:none;box-shadow:0 0 16px -6px rgba(255,95,85,.6)}.small .row .lg img{width:100%;height:100%;object-fit:cover;display:block}
+.hd-list li{display:flex;gap:10px;align-items:flex-start}.li-ic{width:30px;height:30px;border-radius:50%;overflow:hidden;border:1px solid rgba(255,95,85,.55);background:#0b0f19;flex:none;margin-top:1px}.li-ic img{width:100%;height:100%;object-fit:cover;display:block}
+/* certificates: issuer logo in the round frame */
+#certs li,#certs li a{display:flex;align-items:center;gap:12px}#certs li a{color:inherit;text-decoration:none}#certs li>div,#certs li a>div{display:flex;flex-direction:column;gap:2px;min-width:0}
+#certs .lg{width:36px;height:36px;border-radius:50%;overflow:hidden;border:1px solid var(--line);background:#0b0f19;flex:none}#certs .lg img{width:100%;height:100%;object-fit:cover;display:block}

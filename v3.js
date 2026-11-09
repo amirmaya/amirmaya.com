@@ -89,7 +89,7 @@
           ${s.apps ? `<p class="eyebrow sub-h reveal">${esc(ui.apps)}</p><div class="apps">${s.apps.map(a => fig(a.img, "App Store", a.note)).join("")}</div>` : ""}
           ${s.awards ? `<p class="eyebrow sub-h reveal">${esc(ui.awards)}</p><div class="awards">${s.awards.map(a => fig(a.img, "Amazon", a.note)).join("")}</div>` : ""}
           ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot">${t.icon ? `<img class="ticon" src="assets/logos/${t.icon}" alt="">` : ""}<img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${esc(t.name)}</h4><p>${esc(t.d)}</p>${t.bul ? `<ul class="plain tbul">${t.bul.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}${t.stack ? `<ul class="chips tstack">${t.stack.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div></div>`).join("")}</div>` : ""}
-          ${s.small ? `<p class="eyebrow sub-h reveal">${esc(s.small_title)}</p><p class="small-sub reveal">${esc(s.small_sub)}</p><div class="smalls">${s.small.map(t => `<div class="small card"><div class="row"><b>${esc(t.n)}</b><span class="mono">${esc(t.t)}</span></div><p>${esc(t.d)}</p></div>`).join("")}</div>` : ""}
+          ${s.small ? `<p class="eyebrow sub-h reveal">${esc(s.small_title)}</p><p class="small-sub reveal">${esc(s.small_sub)}</p><div class="smalls">${s.small.map(t => `<div class="small card"><div class="row">${t.i ? `<span class="lg"><img src="assets/logos/${t.i}" alt=""></span>` : ""}<b>${esc(t.n)}</b><span class="mono">${esc(t.t)}</span></div><p>${esc(t.d)}</p></div>`).join("")}</div>` : ""}
         </div>
       </article>`).join("");
     requestAnimationFrame(layoutCord); setTimeout(layoutCord, 600); addEventListener("load", layoutCord, { once: true });
@@ -103,7 +103,9 @@
         <div><b>${esc(e.name)}</b><span class="eyebrow">${esc(e.years)} · ${esc(e.kicker)}</span><p>${esc(e.lead)}</p>
         ${e.internships ? `<div class="edu-interns">${e.internships.map(x => `<span class="ei" title="${esc(x.d)}"><img src="assets/logos/${x.logo}" alt=""><span><b>${esc(x.name)}</b> ${esc(x.role)} · ${esc(x.when)}</span></span>`).join("")}</div>` : ""}</div></div>`).join("");
     $("#langbars").innerHTML = me.langs.map(l => `<li><div class="row"><b>${esc(l[0])}</b><span>${esc(l[1])}</span></div><div class="bar"><i style="--w:${l[2]}%"></i></div></li>`).join("");
-    $("#certs").innerHTML = me.certs.map(c => c.u ? `<li><a href="${esc(c.u)}" target="_blank" rel="noopener"><b>${esc(c.t)}</b><span class="eyebrow">${esc(c.o)} · ${esc(c.d)} ↗</span></a></li>` : `<li><b>${esc(c.t)}</b><span class="eyebrow">${esc(c.o)} · ${esc(c.d)}</span></li>`).join("");
+    const certIcon = o => /Michigan/.test(o) ? "umich" : /Google/.test(o) ? "google" : /MongoDB/.test(o) ? "mongodb" : "coursera";
+    $("#certs").innerHTML = me.certs.map(c => { const ic = `<span class="lg"><img src="assets/logos/tiles/${certIcon(c.o)}.png" alt="${esc(c.o)}"></span>`, body = `<div><b>${esc(c.t)}</b><span class="eyebrow">${esc(c.o)} · ${esc(c.d)}${c.u ? " ↗" : ""}</span></div>`;
+      return c.u ? `<li><a href="${esc(c.u)}" target="_blank" rel="noopener">${ic}${body}</a></li>` : `<li>${ic}${body}</li>`; }).join("");
     $("#interests").innerHTML = me.interests.map(c => `<li>${esc(c)}</li>`).join("");
     $("#langbars").classList.add("reveal"); $$(".fcol").forEach(f => f.classList.add("reveal"));
   }
