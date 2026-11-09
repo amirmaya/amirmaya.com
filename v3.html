@@ -8,13 +8,13 @@
 body{margin:0;background:radial-gradient(1200px 700px at 70% 40%,#0e1526 0%,var(--bg) 60%);color:var(--ink2);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
 a{color:inherit;text-decoration:none}
 .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
-.nav{position:fixed;inset:0 0 auto 0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 40px}
+.nav{position:fixed;inset:0 0 auto 0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 32px}
 .brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-weight:700}.brand img{width:36px;height:36px;border-radius:50%;border:1px solid var(--line)}
 .brand .eyebrow{display:block;font-weight:400}
 .nav .right{display:flex;gap:8px;align-items:center}
 .seg{display:flex;border:1px solid var(--line)}.seg button{border:0;background:transparent;font:600 11px var(--mono);letter-spacing:.1em;color:var(--muted);padding:8px 12px;cursor:pointer}.seg button+button{border-left:1px solid var(--line)}.seg button.on{background:var(--ink);color:#07090f}
-.hero{height:100vh;display:grid;grid-template-columns:minmax(380px,44%) 1fr;align-items:center;gap:24px;padding:80px 40px 56px}
-.copy{display:flex;flex-direction:column;gap:18px;max-width:560px}
+.hero{height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:0;padding:72px 0 48px;max-width:1500px;margin:0 auto}
+.copy{display:flex;flex-direction:column;gap:18px;max-width:520px;justify-self:center;padding:0 32px}
 h1{margin:0;color:var(--ink);font-size:clamp(26px,3vw,44px);line-height:1.05;letter-spacing:-.03em;font-weight:800;min-height:2.1em;max-width:22ch}
 h1 .caret{display:inline-block;width:.07em;height:.85em;background:var(--acc);margin-left:.08em;vertical-align:-.08em;animation:caret 1s steps(1) infinite}@keyframes caret{50%{opacity:0}}
 .intro{margin:0;font-size:16px;line-height:1.6;color:var(--ink2);max-width:52ch}
@@ -25,7 +25,7 @@ h1 .caret{display:inline-block;width:.07em;height:.85em;background:var(--acc);ma
 .door>*{padding:8px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}.door>*:last-child{border-right:0}
 .door .live{flex-direction:row;gap:8px;align-items:center;color:var(--acc)}.door .live i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
 .dstat b{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink);line-height:1.1}.dstat span{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
-.brain{position:relative;height:min(78vh,760px);min-height:380px}
+.brain{position:relative;height:min(80vh,780px);min-height:380px;width:100%;justify-self:center}
 canvas{position:absolute;inset:0;width:100%;height:100%}
 .neuron{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:auto;will-change:transform,opacity}
 .neuron .disc{width:64px;height:64px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(46,230,197,.7);box-shadow:0 0 0 4px rgba(46,230,197,.08),0 0 28px rgba(46,230,197,.35);background:#0b0f19;transition:transform .3s,box-shadow .3s;cursor:pointer}
@@ -34,8 +34,8 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
 .neuron .lbl{text-align:center;line-height:1.25;white-space:nowrap}.neuron .lbl b{display:block;color:var(--ink);font-size:12px;font-weight:700}.neuron .lbl span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted)}
 .tip{position:absolute;z-index:4;pointer-events:none;background:#0b0f19;border:1px solid var(--line);color:var(--ink2);padding:12px 14px;width:300px;font-size:13px;line-height:1.5;opacity:0;transform:translate(-50%,-100%) translateY(-10px);transition:opacity .2s,transform .25s;box-shadow:0 20px 50px -20px #000}
 .tip .eyebrow{display:block;margin-bottom:4px;color:var(--acc)}.tip.show{opacity:1;transform:translate(-50%,-100%) translateY(-16px)}
-.legend{position:absolute;left:0;bottom:-6px;display:flex;gap:18px}.legend .eyebrow{display:flex;align-items:center;gap:8px}.legend i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}.legend i.b{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
-.foot{position:fixed;left:40px;right:40px;bottom:16px;display:flex;justify-content:space-between;z-index:5}
+.legend{position:absolute;left:50%;transform:translateX(-50%);bottom:4px;display:flex;gap:18px}.legend .eyebrow{display:flex;align-items:center;gap:8px}.legend i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}.legend i.b{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+.foot{position:fixed;left:32px;right:32px;bottom:14px;display:flex;justify-content:space-between;z-index:5}
 @media (max-width:980px){body{overflow:auto}.hero{grid-template-columns:1fr;height:auto;min-height:100vh;padding:84px 20px 40px;gap:10px}.brain{height:60vh;min-height:360px;order:-1}.neuron .disc{width:48px;height:48px}.foot,.nav .right .eyebrow{display:none}.nav{padding:14px 20px}}
 @media (prefers-reduced-motion:reduce){h1 .caret{animation:none}}
 </style></head>
@@ -106,8 +106,8 @@ canvas{position:absolute;inset:0;width:100%;height:100%}
   function project(p, t) {
     const cy = Math.cos(rotY), sy = Math.sin(rotY), cx = Math.cos(rotX), sx = Math.sin(rotX);
     let x = p.x * cy + p.z * sy, z = -p.x * sy + p.z * cy, y = p.y * cx - z * sx; z = p.y * sx + z * cx;
-    const f = 2.6 / (2.6 + z), S = Math.min(W, H) * .42;
-    return { X: W / 2 + x * f * S, Y: H / 2 + y * f * S * -1, z, f };
+    const f = 2.6 / (2.6 + z), S = Math.min(W, H) * .44;
+    return { X: W / 2 + x * f * S, Y: H / 2 - 10 + y * f * S * -1, z, f };
   }
   function buildNeurons() {
     const box = $("#neurons"); box.innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="index.html#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${s.name}"></span><span class="lbl"><b>${s.name}</b><span>${s.years}</span></span></a>`).join("");
