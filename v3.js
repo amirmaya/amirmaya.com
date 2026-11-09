@@ -71,7 +71,7 @@
   function renderStory() {
     const ui = C().ui;
     $("#storyList").innerHTML = C().stops.map((s, i) => `
-      <article class="stopsec" id="${s.id}">
+      <article class="stopsec" id="${s.id}" style="--i:${i}">
         <div class="bigyear" aria-hidden="true">${esc(s.years.split(/\s|–/)[0])}</div>
         <aside class="side"><div class="reveal">${logo(s, "biglogo")}</div><div class="chap reveal"><span class="n">${String(i + 1).padStart(2, "0")}</span><span class="eyebrow">${esc(s.years)}</span></div></aside>
         <div class="main">
