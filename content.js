@@ -14,7 +14,7 @@ window.CONTENT = {
           { logo: "tiles/tuborg.png", name: "Türk Tuborg", role: "Finance & Marketing Intern", when: "Jun – Jul 2016", d: "SAP, client visits, distributor shipments to Metro and Carrefour." }
         ] },
     ],
-    me: { name: "Amir Maya", title: "Marketplace consultant · builder", where: "Istanbul, Türkiye",
+    me: { name: "Amir Maya", title: "Marketplace Consultant @ Amazon TR 3P · Builder and lifelong learner", where: "Istanbul, Türkiye",
           tagline: "Welcome in. I'm Amir. I build things that make businesses move faster: a sneaker marketplace from zero to 200M+ TRY, and now, in Amazon Turkey's 3P Softlines, the growth of strategic sellers and the tools I build and scale to make account management sharper. I like understanding customers, cutting workflows down to what matters, and shipping. There is always a better way, and I usually go find it.",
           langs: [["Turkish","Native",100],["English","Native",100],["Hebrew","Intermediate",55],["Spanish","Beginner",25]],
           certs: [
@@ -33,7 +33,7 @@ window.CONTENT = {
           glance: [["8 / 10","top Softlines sellers managed"],["70+","sellers managed so far"],["147K+","competitor sellers mapped"],["200M+ TRY","Hype-Merch GMV"]] },
     headlines: ["There's always a better way to do things.", "Account manager at Amazon who also builds the tools his team uses.", "Built Hype Merch from zero: 200M+ TRY GMV, 40K+ sales, 55K users.", "Now at Amazon, growing strategic sellers in 3P Softlines.", "Product thinking, execution, and work that moves the needle."],
     duty_facts: [["Now", "Strategic Account Services, Amazon Turkey 3P · Softlines"], ["Focus", "Strategic accounts · seller growth · internal tooling"], ["Speaks", "Turkish (native) · English (native) · Hebrew (intermediate) · Spanish (beginner)"], ["Base", "Istanbul"]],
-    ui: { story: "Story", facts: "Profile", role_short: "Marketplace consultant", eyebrow: "My career, laid out as a route", cta_story: "Walk the route", cv: "Resume (PDF)", duty: "Right now", live: "Available",
+    ui: { story: "Story", facts: "Profile", role_short: "Marketplace Consultant · Amazon TR 3P", eyebrow: "My career, laid out as a route", cta_story: "Walk the route", cv: "Resume (PDF)", duty: "Right now", live: "Available",
           route_eyebrow: "00 · Route", g_all: "Everything", g_l0: "Education", g_l1: "Career", g_l2: "Tools & products", g_l3: "Proof", g_verify: "Verify", g_read: "Read the chapter", g_hint: "Click a stop to open what came out of it.", g_desktop: "Desktop tools", g_bots: "Discord bots", door: "Visitor count", door_today: "today", door_now: "online now", door_avg: "avg. visit", door_note: "Anonymous · no cookies", s1_eyebrow: "01 · Story · Stop by stop", s1_title: "Stop by stop.", s1_intro: "Each stop is its own chapter: what I did there, what it taught me, and what I built because of it.",
           s3_eyebrow: "03 · Profile · Details", s3_title: "The details.", education: "Education", skills: "What I do", s2_eyebrow: "02 · Education", s4_eyebrow: "04 · Contact · Register", work: "Work", contact: "Contact", scroll: "Scroll", hover: "Hover a stop. Scroll to read it in order.",
           intro: "Twelve years, seven stops. Each one taught me the next.", role: "Seller growth · marketplace tooling",
@@ -118,7 +118,7 @@ window.CONTENT = {
           { logo: "tiles/tuborg.png", name: "Türk Tuborg", role: "Finans & Pazarlama Stajyeri", when: "Haz – Tem 2016", d: "SAP, müşteri ziyaretleri, Metro ve Carrefour'a distribütör sevkiyatları." }
         ] },
     ],
-    me: { name: "Amir Maya", title: "Marketplace danışmanı · builder", where: "İstanbul, Türkiye",
+    me: { name: "Amir Maya", title: "Marketplace Consultant @ Amazon TR 3P · Kurucu ruhlu, ömür boyu öğrenen", where: "İstanbul, Türkiye",
           tagline: "Hoş geldin. Ben Amir. İşletmeleri hızlandıran şeyler kurarım: sıfırdan 200M+ TL'ye çıkan bir sneaker pazaryeri; şimdi de Amazon Türkiye 3P Softlines'ta stratejik satıcıların büyümesi ve hesap yönetimini keskinleştirmek için kurup ölçeklendirdiğim araçlar. Müşteriyi anlamayı, iş akışlarını özüne indirmeyi ve teslim etmeyi severim. Her zaman daha iyi bir yol vardır; genelde gidip bulurum.",
           langs: [["Türkçe","Ana dil",100],["İngilizce","Ana dil",100],["İbranice","Orta",55],["İspanyolca","Başlangıç",25]],
           certs: [
@@ -137,7 +137,7 @@ window.CONTENT = {
           glance: [["8 / 10","yönetilen en büyük Softlines satıcısı"],["70+","bugüne kadar yönetilen satıcı"],["147K+","haritalanan rakip satıcı"],["200M+ TL","Hype-Merch GMV"]] },
     headlines: ["Her işin daha iyi bir yolu vardır.", "Amazon'da hesap yöneticisi; ekibinin kullandığı araçları da kuran.", "Hype Merch'i sıfırdan kurdum: 200M+ TL GMV, 40K+ satış, 55K kullanıcı.", "Şimdi Amazon'da, 3P Softlines'ta stratejik satıcıları büyütüyorum.", "Ürün düşüncesi, icraat ve gerçekten fark yaratan işler."],
     duty_facts: [["Şimdi", "Strategic Account Services, Amazon Türkiye 3P · Softlines"], ["Odak", "Stratejik hesaplar · satıcı büyümesi · dahili araçlar"], ["Diller", "Türkçe (ana dil) · İngilizce (ana dil) · İbranice (orta) · İspanyolca (başlangıç)"], ["Üs", "İstanbul"]],
-    ui: { story: "Hikâye", facts: "Profil", role_short: "Marketplace danışmanı", eyebrow: "Kariyerim, bir rota olarak", cta_story: "Rotayı yürü", cv: "Özgeçmiş (PDF)", duty: "Şu an", live: "Müsait",
+    ui: { story: "Hikâye", facts: "Profil", role_short: "Marketplace Consultant · Amazon TR 3P", eyebrow: "Kariyerim, bir rota olarak", cta_story: "Rotayı yürü", cv: "Özgeçmiş (PDF)", duty: "Şu an", live: "Müsait",
           route_eyebrow: "00 · Rota", g_all: "Hepsi", g_l0: "Eğitim", g_l1: "Kariyer", g_l2: "Araçlar & ürünler", g_l3: "Kanıt", g_verify: "Doğrula", g_read: "Bölümü oku", g_hint: "Bir durağa tıkla; oradan çıkanlar açılır.", g_desktop: "Masaüstü araçlar", g_bots: "Discord botları", door: "Ziyaretçi sayısı", door_today: "bugün", door_now: "şu an online", door_avg: "ort. ziyaret", door_note: "Anonim · çerez yok", s1_eyebrow: "01 · Hikâye · Durak durak", s1_title: "Durak durak.", s1_intro: "Her durak kendi bölümü: orada ne yaptım, bana ne öğretti, bu yüzden ne kurdum.",
           s3_eyebrow: "03 · Profil · Detaylar", s3_title: "Detaylar.", education: "Eğitim", skills: "Ne yaparım", s2_eyebrow: "02 · Eğitim", s4_eyebrow: "04 · İletişim · Kasa", work: "İşler", contact: "İletişim", scroll: "Kaydır", hover: "Bir durağın üzerine gel. Sırayla okumak için kaydır.",
           intro: "On iki yıl, yedi durak. Her biri bir sonrakini öğretti.", role: "Satıcı büyümesi · marketplace araçları",

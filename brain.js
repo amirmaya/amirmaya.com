@@ -88,14 +88,21 @@
   const cordS = cordPath.map(i => stemPts[i].s);
   const LINK = "124,156,255";
   // draw a route as brighter edges + a glow dot travelling along it (k in 0..1)
+  const SIG = "255,95,85";
+  // draw a route as brighter edges; when k (0..1) is given, a red signal rides it and leaves a short glowing tail behind it,
+  // so the direction of travel (and therefore the order of the stops) is visible. Returns each node's fraction along the route.
   function drawRoute(ctx, P, path, alpha, k, lw = 1.3) {
-    ctx.lineWidth = lw; ctx.strokeStyle = `rgba(${LINK},${alpha})`; ctx.beginPath(); let first = true, L = 0; const segs = [];
-    for (let i = 0; i < path.length; i++) { const q = P[path[i]]; if (!q) { first = true; continue; } if (first) { ctx.moveTo(q.X, q.Y); first = false; } else { const pr = P[path[i - 1]]; const d = Math.hypot(q.X - pr.X, q.Y - pr.Y); segs.push([pr, q, L, L + d]); L += d; ctx.lineTo(q.X, q.Y); } }
-    ctx.stroke();
+    const segs = []; let L = 0, prev = null; const nodeFrac = new Array(path.length).fill(-1);
+    for (let i = 0; i < path.length; i++) { const q = P[path[i]]; if (!q) { prev = null; continue; } if (prev) { const d = Math.hypot(q.X - prev.X, q.Y - prev.Y); segs.push([prev, q, L, L + d]); L += d; } nodeFrac[i] = L; prev = q; }
+    if (!L) return nodeFrac; for (let i = 0; i < nodeFrac.length; i++) if (nodeFrac[i] >= 0) nodeFrac[i] /= L;
+    for (const sg of segs) { const f = (sg[2] + sg[3]) / 2 / L, d = k >= 0 ? k - f : -1, boost = d >= 0 && d < .2 ? 1 - d / .2 : 0;
+      ctx.strokeStyle = boost > 0 ? `rgba(${SIG},${Math.min(1, alpha + boost * .7).toFixed(3)})` : `rgba(${LINK},${alpha})`; ctx.lineWidth = lw + boost * 1.4; ctx.beginPath(); ctx.moveTo(sg[0].X, sg[0].Y); ctx.lineTo(sg[1].X, sg[1].Y); ctx.stroke(); }
     for (const i of path) { const q = P[i]; if (!q) continue; ctx.fillStyle = `rgba(214,226,255,${Math.min(1, alpha + .25)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, 1.3 * q.f, 0, 6.283); ctx.fill(); }
     if (k >= 0 && segs.length) { const target = k * L; const sgm = segs.find(sg => target <= sg[3]) || segs[segs.length - 1]; const u = (target - sgm[2]) / Math.max(1e-6, sgm[3] - sgm[2]), X = sgm[0].X + (sgm[1].X - sgm[0].X) * u, Y = sgm[0].Y + (sgm[1].Y - sgm[0].Y) * u;
-      ctx.save(); ctx.shadowColor = `rgba(${LINK},1)`; ctx.shadowBlur = 16; ctx.fillStyle = "rgba(230,238,255,.95)"; ctx.beginPath(); ctx.arc(X, Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); }
+      ctx.save(); ctx.shadowColor = `rgba(${SIG},1)`; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(255,235,232,.98)"; ctx.beginPath(); ctx.arc(X, Y, 2.8, 0, 6.283); ctx.fill(); ctx.restore(); }
+    return nodeFrac;
   }
+  const anchorIdx = anchors.map((_, j) => linkPath.indexOf(anchorPts[j])), fired = new Array(anchors.length).fill(0);
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
   const FOCAL = 3.2;
@@ -154,7 +161,7 @@
 
   /* ---- neurons ---- */
   function buildNeurons() {
-    $("#neurons").innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span>${childrenOf(s.id).length ? `<span class="cnt">${childrenOf(s.id).length}</span>` : ""}<span class="lbl"><b>${esc(s.name)}</b><span>${esc(s.years)}</span></span></a>`).join("");
+    $("#neurons").innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span><span class="cnt">${String(i + 1).padStart(2, "0")}</span><span class="lbl"><b>${esc(s.name)}</b><span>${esc(s.years)}</span></span></a>`).join("");
     const tip = $("#tip");
     $$(".neuron").forEach(el => {
       el.addEventListener("click", e => { e.preventDefault(); const i = +el.dataset.i; focus === i ? unfocus() : focusOn(i); });
@@ -273,7 +280,8 @@
     drawCloud(ctx, P, pts.map(q => ({ sz: q.s * Math.sqrt(zoom) })), edges, 0, N, () => dim, null, stim, t);
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     // neurons are wired to each other through the brain's own edges (shortest routes along the point graph), the signal runs along the route
-    drawRoute(ctx, P, linkPath, focus === null ? .6 : .3, (!reduced && focus === null) ? (((t * .12) % 1) + 1) % 1 : -1);
+    { const k = (!reduced && focus === null) ? (((t * .1) % 1) + 1) % 1 : -1, nf = drawRoute(ctx, P, linkPath, focus === null ? .6 : .3, k);
+      if (k >= 0) anchorIdx.forEach((ai, j) => { const f = nf[ai]; if (f >= 0 && k >= f - .015 && k - f < .06 && t - fired[j] > 2) { fired[j] = t; const el = $$(".neuron")[j]; if (el) { el.classList.add("fire"); setTimeout(() => el.classList.remove("fire"), 900); } } }); }
     if (focus === null && innerWidth > 980) {                          // brain stem: the column leaves the stage through its base, the story canvas continues it
       const sMax = Math.max(0, (H + 30 - cY) / (baseS * zoom) + STEM.top) + .3; let to = 0; while (to < stemPts.length && stemPts[to].s < sMax) to++; stemTo = to;
       const P = []; for (let i = 0; i < to; i++) P.push(projStem(stemPoint(stemPts[i])));
