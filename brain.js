@@ -20,12 +20,12 @@
     const stats = (s.stats || []).filter(([v]) => !/^Discord$/.test(v)).map(([v, l, d]) => ({ k: l, t: v, val: v, sl: l, d: d || s.lead }));
     const nodes = (s.nodes || []).map(x => ({ k: s.name, t: x.n, val: x.v, sl: x.n, d: x.d }));
     if (id === "amazon") return [...stats,
-      ...(s.tools || []).map(t => ({ k: c.ui.tools, t: t.name, logo: t.icon, d: t.d, img: t.img, blur: true })),
+      ...(s.tools || []).map(t => ({ k: c.ui.tools, t: t.name, logo: t.icon, d: t.d, imgs: [t.img], blur: true })),
       { k: s.small_title, t: ui().g_desktop || "Desktop tools", logo: "tiles/sweep.png", sl: ui().g_desktop || "Desktop tools", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d, x.i]) },
-      ...(s.awards || []).map(a => ({ k: c.ui.awards, t: a.note, img: a.img, d: a.note })) ];
+      ...(s.awards || []).map(a => ({ k: c.ui.awards, t: a.note, logo: "tiles/award.png", imgs: [a.img], d: a.note })) ];
     if (id === "hypemerch") return [...stats,
-      ...(s.press || []).map(p => ({ k: c.ui.press, t: p.outlet, img: p.img, d: p.note })),
-      { k: "App Store", t: "Hype-Merch app", img: (s.apps || [{}])[0].img, d: s.body[1], imgs: (s.apps || []).map(a => a.img) } ];
+      ...(s.press || []).map(p => ({ k: c.ui.press, t: p.outlet, logo: p.logo || "tiles/press.png", imgs: [p.img], d: p.note })),
+      { k: "App Store", t: "Hype-Merch app", logo: "tiles/appstore.png", d: ui().app_d || s.body[2], imgs: (s.apps || []).map(a => a.img) } ];
     if (id === "coursera") return c.me.certs.map(x => ({ k: x.o, t: x.t, logo: certIcon(x.o), d: x.d, link: x.u }));
     if (id === "trnotify") return [...stats, { k: "Discord", t: ui().g_bots || "Discord bots", logo: "tiles/bots.png", d: ui().bots_d || s.lead }];
     return [...stats, ...nodes];
@@ -214,7 +214,7 @@
   }
   let sats = [];
   function renderSats(kids) {
-    const narrow = matchMedia("(max-width:980px)").matches, item = (k, j, cls) => { const lab = k.sl || k.t; return `<button class="${cls}" style="--d:${320 + j * 55}ms" data-j="${j}" title="${esc(k.t)}">${k.val ? `<span class="sd sv">${esc(k.val)}</span>` : `<span class="sd"><img src="${k.img ? "assets/img/" + k.img : "assets/logos/" + k.logo}" alt=""></span>`}<span class="sl">${esc(lab.length > 18 ? lab.slice(0, 17) + "…" : lab)}</span></button>`; };
+    const narrow = matchMedia("(max-width:980px)").matches, item = (k, j, cls) => { const lab = k.sl || k.t; return `<button class="${cls}" style="--d:${320 + j * 55}ms" data-j="${j}" title="${esc(k.t)}">${k.val ? `<span class="sd sv">${esc(k.val)}</span>` : `<span class="sd"><img src="${k.logo ? "assets/logos/" + k.logo : "assets/img/" + k.img}" alt=""></span>`}<span class="sl">${esc(lab.length > 18 ? lab.slice(0, 17) + "…" : lab)}</span></button>`; };
     // wide screens: satellites float around the neuron; narrow screens: the same items as a chip strip inside the panel
     $("#sats").innerHTML = narrow ? "" : kids.map((k, j) => item(k, j, "sat")).join("");
     const strip = $(".holo-chips"); if (strip) strip.innerHTML = narrow ? kids.map((k, j) => item(k, j, "chip")).join("") : "";
@@ -277,7 +277,8 @@
     offX += (tOffX - offX) * .08; offY += (tOffY - offY) * .08;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .95 : 1, P = pts.map(p => project(p));
-    const stim = (hover && focus === null && px > -1e3) ? { X: px, Y: py, R: 95 } : null;
+    const stim = (hover && px > -1e3) ? { X: px, Y: py, R: 95 } : null;
+    $$(".neuron").forEach(el => { const x = parseFloat(el.style.left), y = parseFloat(el.style.top); el.classList.toggle("lit", !!stim && Math.hypot(x - stim.X, y - stim.Y) < 110); });
     drawCloud(ctx, P, pts.map(q => ({ sz: q.s * Math.sqrt(zoom) })), edges, 0, N, () => dim, null, stim, t);
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     // neurons are wired to each other through the brain's own edges (shortest routes along the point graph), the signal runs along the route

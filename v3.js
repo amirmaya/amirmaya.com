@@ -5,7 +5,7 @@
   history.scrollRestoration = "manual";
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
   scrollTo(0, 0);
-  let lang = localStorage.getItem("lang") || ((navigator.language || "en").toLowerCase().startsWith("tr") ? "tr" : "en");
+  let lang = "en";                       // English only (Turkish copy kept in content.js, toggle removed)
   const C = () => CONTENT[lang];
   const logo = (s, cls = "") => `<span class="${cls}"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span>`;
   const smooth = sel => { const t = $(sel); t && t.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" }); };
@@ -88,7 +88,7 @@
           ${s.press ? `<p class="eyebrow sub-h reveal">${esc(ui.press)}</p><div class="press">${s.press.map(p => fig(p.img, p.outlet, p.note)).join("")}</div>` : ""}
           ${s.apps ? `<p class="eyebrow sub-h reveal">${esc(ui.apps)}</p><div class="apps">${s.apps.map(a => fig(a.img, "App Store", a.note)).join("")}</div>` : ""}
           ${s.awards ? `<p class="eyebrow sub-h reveal">${esc(ui.awards)}</p><div class="awards">${s.awards.map(a => fig(a.img, "Amazon", a.note)).join("")}</div>` : ""}
-          ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot">${t.icon ? `<img class="ticon" src="assets/logos/${t.icon}" alt="">` : ""}<img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${esc(t.name)}</h4><p>${esc(t.d)}</p>${t.bul ? `<ul class="plain tbul">${t.bul.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}${t.stack ? `<ul class="chips tstack">${t.stack.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div></div>`).join("")}</div>` : ""}
+          ${s.tools ? `<p class="eyebrow sub-h reveal">${esc(ui.tools)}</p><div class="tools-grid">${s.tools.map(t => `<div class="tool card"><div class="shot">${t.icon ? `<img class="ticon" src="assets/logos/${t.icon}" alt="">` : ""}<img src="assets/img/${t.img}" alt="" loading="lazy"><span class="lock">${esc(ui.blur_note)}</span></div><div class="txt"><h4>${t.icon ? `<span class="tmark"><img src="assets/logos/${t.icon}" alt=""></span>` : ""}${esc(t.name)}</h4><p>${esc(t.d)}</p>${t.bul ? `<ul class="plain tbul">${t.bul.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}${t.stack ? `<ul class="chips tstack">${t.stack.map(x => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}</div></div>`).join("")}</div>` : ""}
           ${s.small ? `<p class="eyebrow sub-h reveal">${esc(s.small_title)}</p><p class="small-sub reveal">${esc(s.small_sub)}</p><div class="smalls">${s.small.map(t => `<div class="small card"><div class="row">${t.i ? `<span class="lg"><img src="assets/logos/${t.i}" alt=""></span>` : ""}<b>${esc(t.n)}</b><span class="mono">${esc(t.t)}</span></div><p>${esc(t.d)}</p></div>`).join("")}</div>` : ""}
         </div>
       </article>`).join("");
@@ -149,7 +149,7 @@
   function bindLightbox() {
     /* proof thumbnails are handled by gallery.js (delegated click) */
   }
-  const tick = () => { $("#clock").textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
+  const tick = () => { if (!$("#clock")) return; $("#clock").textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
   tick(); setInterval(tick, 20000);
 
   document.body.classList.add("booting"); render(true); onScroll(); setTimeout(() => document.body.classList.remove("booting"), 350);
