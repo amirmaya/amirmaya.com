@@ -168,7 +168,7 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
   .stopsec .side{grid-column:1;grid-row:1}.stopsec .main{grid-row:2}.stopsec .chap{flex-direction:row;align-items:center}.stopsec .side>.reveal:first-child{width:56px;height:56px}.stopsec .biglogo{width:56px;height:56px}.stopsec .side>.reveal:first-child::after{display:none}
   .stopsec .main{padding:18px 18px 20px;margin-left:0}.stopsec h2{font-size:24px}.stopsec .lead{font-size:17px}}
 /* cord between the hero and the spine: same two-layer stroke as the spine (soft glow + vertebra dashes) */
-#story{position:relative}.cord{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible;z-index:0}
-.cord path{fill:none;stroke:var(--accent);stroke-width:2}.cord .c1{opacity:.28;filter:drop-shadow(0 0 7px var(--accent))}.cord .c2{opacity:.55;stroke-dasharray:5 16;stroke-linecap:round}
-#story .wrap{position:relative;z-index:1}#story .section-head{max-width:min(820px,54vw)}
-@media (max-width:980px){.cord{display:none}#story .section-head{max-width:none}}
+#story{position:relative;padding-top:0}.spine{position:sticky;top:0;display:block;width:100%;height:100vh;margin-bottom:-100vh;pointer-events:none;z-index:0}
+#story .wrap{position:relative;z-index:1;padding-top:96px}#story .section-head{max-width:min(820px,54vw)}
+@media (min-width:981px){#storyList::before,#storyList::after,.stopsec::before,.stopsec .side>.reveal:first-child::after{display:none}}
+@media (max-width:980px){.spine{display:none}#story .section-head{max-width:none}}
