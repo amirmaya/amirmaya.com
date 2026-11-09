@@ -215,3 +215,11 @@ html{scroll-padding-top:84px}
 .gal-x{display:grid;place-items:center;top:22px;right:24px;transform:none}
 body.gal-open{overflow:hidden}
 @media (max-width:620px){.gal-prev{left:8px}.gal-next{right:8px}.gal-cap{bottom:2vh;padding:8px 14px}}
+/* chapter neurons: the logo wrapper is a span; make it a real box so the circle actually clips */
+.biglogo,.photo,.brand-mark{display:block}
+.tstack{margin-top:12px}.tool .txt .chips li{font-size:10px}
+/* stats grids with more than four cells wrap evenly */
+.stats{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.stats>div{border-right:1px solid var(--line)}.stats>div:last-child{border-right:1px solid var(--line)}
+/* the stimulus probe follows the pointer over the whole page */
+.probe{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300;mix-blend-mode:screen}
+@media (pointer:coarse){.probe{display:none}}

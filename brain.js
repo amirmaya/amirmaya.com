@@ -21,7 +21,7 @@
     const nodes = (s.nodes || []).map(x => ({ k: s.name, t: x.n, val: x.v, sl: x.n, d: x.d }));
     if (id === "amazon") return [...stats,
       ...(s.tools || []).map(t => ({ k: c.ui.tools, t: t.name, logo: t.icon, d: t.d, img: t.img, blur: true })),
-      { k: s.small_title, t: ui().g_desktop || "Desktop tools", logo: "tiles/sweep.png", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d]) },
+      { k: s.small_title, t: ui().g_desktop || "Desktop tools", val: String((s.small || []).length), sl: ui().g_desktop || "Desktop tools", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d]) },
       ...(s.awards || []).map(a => ({ k: c.ui.awards, t: a.note, img: a.img, d: a.note })) ];
     if (id === "hypemerch") return [...stats,
       ...(s.press || []).map(p => ({ k: c.ui.press, t: p.outlet, img: p.img, d: p.note })),
@@ -247,7 +247,6 @@
       ctx.save(); ctx.lineWidth = 1.6; ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath();
       for (let ss = 0, first = true; ss <= sMax; ss += .2) { const a = axisAt(ss), q = projStem({ x: a.x, y: STEM.top - ss, z: a.z }); first ? ctx.moveTo(q.X, q.Y) : ctx.lineTo(q.X, q.Y); first = false; } ctx.stroke(); ctx.restore();
       if (!reduced && sig < sMax) { const a = axisAt(sig), q = projStem({ x: a.x, y: STEM.top - sig, z: a.z }); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); } }
-    if (stim) drawProbe(ctx, stim.X, stim.Y, stim.R, t);
     if (!reduced && focus === null) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
