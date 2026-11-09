@@ -15,7 +15,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace Consultant @ Amazon TR 3P · Builder and lifelong learner", where: "Istanbul, Türkiye",
-          tagline: "I build things that make businesses move faster: a sneaker marketplace from zero to 200M+ TRY, and now, in Amazon Turkey's 3P Softlines, the growth of strategic sellers and the tools I build and scale to make account management sharper. I like understanding customers, cutting workflows down to what matters, and shipping. There is always a better way, and I usually go find it.",
+          tagline: "I build things that make businesses move faster: a sneaker marketplace from zero to 200M+ TRY, and now, in Amazon Turkey's 3P Softlines, the growth of strategic sellers and the tools I build and scale to make account management sharper. I like understanding customers and cutting workflows down to what matters. There is always a better way, and I try to find it.",
           langs: [["Turkish","Native",100],["English","Native",100],["Hebrew","Intermediate",55],["Spanish","Beginner",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "University of Michigan", d: "Apr 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
@@ -119,7 +119,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace Consultant @ Amazon TR 3P · Kurucu ruhlu, ömür boyu öğrenen", where: "İstanbul, Türkiye",
-          tagline: "İşletmeleri hızlandıran şeyler kurarım: sıfırdan 200M+ TL'ye çıkan bir sneaker pazaryeri; şimdi de Amazon Türkiye 3P Softlines'ta stratejik satıcıların büyümesi ve hesap yönetimini keskinleştirmek için kurup ölçeklendirdiğim araçlar. Müşteriyi anlamayı, iş akışlarını özüne indirmeyi ve teslim etmeyi severim. Her zaman daha iyi bir yol vardır; genelde gidip bulurum.",
+          tagline: "İşletmeleri hızlandıran şeyler kurarım: sıfırdan 200M+ TL'ye çıkan bir sneaker pazaryeri; şimdi de Amazon Türkiye 3P Softlines'ta stratejik satıcıların büyümesi ve hesap yönetimini keskinleştirmek için kurup ölçeklendirdiğim araçlar. Müşteriyi anlamayı ve iş akışlarını özüne indirmeyi severim. Her zaman daha iyi bir yol vardır; onu bulmaya çalışırım.",
           langs: [["Türkçe","Ana dil",100],["İngilizce","Ana dil",100],["İbranice","Orta",55],["İspanyolca","Başlangıç",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "Michigan Üniversitesi", d: "Nis 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
