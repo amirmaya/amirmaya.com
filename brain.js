@@ -40,9 +40,7 @@
       x = Math.abs(x) * .50 + .04; y = y * .64; z = z * .98; if (y < -.25) y = -.25 - (y + .25) * .45; if (z > .6) y -= (z - .6) * .35;   // frontal lobe slopes down
       const g = .035 * Math.sin(z * 9 + y * 7) * Math.cos(x * 11 + z * 5);                                             // gyri texture
       pts.push({ x: side * (x + g), y: y + .1 + g, z: z - .05 + g, s: .55 + R() * 1.0 }); } };
-  hemi(-1, 560); hemi(1, 560);
-  for (let i = 0; i < 170; i++) { const u = R() * 6.2832, v = Math.acos(2 * R() - 1); pts.push({ x: Math.sin(v) * Math.cos(u) * .40, y: -.40 + Math.cos(v) * .24, z: -.52 + Math.sin(v) * Math.sin(u) * .30, s: .5 + R() * .8 }); }  // cerebellum
-  for (let i = 0; i < 70; i++) { const a = R() * 6.2832, t = R(); pts.push({ x: Math.cos(a) * .13, y: -.42 - t * .55, z: -.22 + Math.sin(a) * .13 + t * .08, s: .5 + R() * .7 }); }       // brainstem
+  hemi(-1, 900); hemi(1, 900);
   const N = pts.length;
   for (let i = 0; i < N; i++) { const d = []; const p = pts[i]; for (let j = 0; j < N; j++) if (j !== i) { const q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); } d.sort((a, b2) => a[0] - b2[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
   const anchors = [[-.62, .12, .55], [-.36, .66, .25], [.05, .5, .82], [.40, .68, .1], [.64, .22, .5]];
@@ -92,7 +90,7 @@
   function focusOn(i) {
     if (focus === null) expand();
     focus = i; auto = false; $("#tip").classList.remove("show");
-    const a = anchors[i]; tRotY = Math.atan2(a[0], -a[2]) * .85; tRotX = -.1 + a[1] * .3; tZoom = 2.1;
+    const a = anchors[i]; tRotY = Math.atan2(a[0], a[2]); tRotX = Math.max(-.5, Math.min(.5, -a[1] * .6)); tZoom = 2.6;
     const s = C().stops[i], kids = childrenOf(s.id), u = ui(), holo = $("#holo");
     holo.innerHTML = `<button class="holo-close btn" data-back>✕ ${esc(u.v3_back)}</button>
       <div class="holo-panel">
@@ -129,12 +127,14 @@
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
     if (auto && !drag && !reduced && focus === null) tRotY += .0008;
     rotY += (tRotY - rotY) * .06; rotX += (tRotX - rotX) * .06; zoom += (tZoom - zoom) * .07;
-    if (focus !== null) { const a = project({ x: anchors[focus][0], y: anchors[focus][1], z: anchors[focus][2] }, true); tOffX = W * .27 - a.X; tOffY = H * .52 - a.Y; }
+    if (focus !== null) { const c0 = project({ x: 0, y: .1, z: 0 }, true); tOffX = W * .5 - c0.X; tOffY = H * .5 - c0.Y; }
     offX += (tOffX - offX) * .07; offY += (tOffY - offY) * .07;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    const dim = focus !== null ? .55 : 1, P = pts.map(p => project(p));
-    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.06 + (1 - (d + 1) / 2) * .26) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
-    for (let i = 0; i < N; i++) { const p = P[i], al = (.25 + (1 - (p.z + 1) / 2) * .6) * dim, r = pts[i].s * p.f * Math.sqrt(zoom); ctx.fillStyle = `rgba(200,214,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
+    const dim = focus !== null ? .95 : 1, P = pts.map(p => project(p));
+    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.07 + (1 - (d + 1) / 2) * .34) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
+    for (let i = 0; i < N; i++) { const p = P[i], depth = 1 - (p.z + 1) / 2, al = (.3 + depth * .65) * dim, r = pts[i].s * p.f * Math.sqrt(zoom);
+      ctx.fillStyle = `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
     for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
@@ -142,11 +142,11 @@
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
     // hologram links
-    if (focus !== null) { const a = A[focus]; const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + 60); ctx.stroke(); ctx.setLineDash([]); }
+    if (focus !== null) { const a = A[focus]; const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + pr.height * .5); ctx.stroke(); ctx.setLineDash([]); }
       for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
     $$(".neuron").forEach((el, i) => { const a = A[i], depth = 1 - (a.z + 1) / 2; el.style.left = a.X + "px"; el.style.top = a.Y + "px";
-      const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.6 : .6)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
-      el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .18); el.style.zIndex = Math.round(depth * 10) + 2; });
+      const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.7 : .5)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
+      el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .1); el.style.zIndex = Math.round(depth * 10) + 2; });
     requestAnimationFrame(frame);
   }
   window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };

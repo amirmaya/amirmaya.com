@@ -35,16 +35,17 @@ h1 .caret{display:inline-block;width:.07em;height:.85em;background:var(--accent)
 @media (max-width:980px){.hero-grid{grid-template-columns:1fr}.brain{height:56vh;min-height:340px;order:-1}.copy{padding:0 20px;max-width:none}.neuron .disc{width:48px;height:48px}.hero-foot{flex-direction:column;align-items:flex-start;gap:10px;padding:0 20px}}
 
 /* hologram layer (full-screen focus) */
-.brain.focused{position:fixed;inset:0;z-index:80;height:100vh!important;min-height:0;background:radial-gradient(900px 600px at 30% 50%,#101a2e 0%,#07090f 70%)}
-body.brain-open{overflow:hidden}.brain.focused .legend{display:none}
+.brain.focused{position:fixed;inset:0;z-index:80;height:100vh!important;min-height:0;background:radial-gradient(1100px 800px at 50% 50%,#0f1830 0%,#07090f 72%)}
+body.brain-open{overflow:hidden}body.brain-open .fascia,body.brain-open .progress{opacity:0;pointer-events:none;transition:opacity .4s}.brain.focused .legend{display:none}
+.brain.focused .neuron .lbl{opacity:0;transition:opacity .3s}.brain.focused .neuron:hover .lbl{opacity:1}
 .holo{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .35s .3s}.holo.on{opacity:1}
 .holo-close{position:absolute;top:18px;right:24px;pointer-events:auto;min-height:38px;padding:0 14px;font-size:12.5px}
-.holo-panel{position:absolute;left:52%;right:4%;top:50%;transform:translateY(-50%);max-height:86vh;overflow:auto;pointer-events:auto;display:flex;flex-direction:column;gap:14px;padding:22px 24px;background:rgba(10,16,30,.55);border:1px solid rgba(46,230,197,.35);backdrop-filter:blur(10px);box-shadow:0 0 0 1px rgba(46,230,197,.06),0 30px 80px -30px rgba(46,230,197,.35);animation:holoin .6s var(--ease) .2s both}
+.holo-panel{position:absolute;left:auto;right:3%;width:min(420px,38%);top:50%;transform:translateY(-50%);max-height:84vh;overflow:auto;pointer-events:auto;display:flex;flex-direction:column;gap:14px;padding:22px 24px;background:rgba(7,9,15,.42);border:1px solid rgba(46,230,197,.3);backdrop-filter:blur(8px);box-shadow:0 0 0 1px rgba(46,230,197,.06),0 30px 80px -30px rgba(46,230,197,.35);animation:holoin .6s var(--ease) .2s both}
 .holo-panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(46,230,197,.035) 0 1px,transparent 1px 4px);pointer-events:none}
-.holo-head h3{margin:4px 0 8px;font-size:24px;color:var(--ink);letter-spacing:-.02em}.holo-head h3 .mono{font-size:12px;color:var(--accent);margin-left:10px;letter-spacing:.08em}
-.holo-head p{margin:0 0 12px;font-size:14px;color:var(--ink2);line-height:1.55;max-width:60ch}.holo-acts .btn{min-height:36px;padding:0 12px;font-size:12.5px}
-.holo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.holo-card{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(7,9,15,.6);border:1px solid rgba(46,230,197,.35);color:var(--ink);text-align:left;cursor:pointer;position:relative;animation:holoin .5s var(--ease) both;animation-delay:var(--d,0ms);transition:border-color .2s,transform .2s,background .2s}
+.holo-head h3{margin:4px 0 8px;font-size:21px;color:var(--ink);letter-spacing:-.02em}.holo-head h3 .mono{font-size:12px;color:var(--accent);margin-left:10px;letter-spacing:.08em}
+.holo-head p{margin:0 0 12px;font-size:13px;color:var(--ink2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}.holo-acts .btn{min-height:36px;padding:0 12px;font-size:12.5px}
+.holo-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.holo-card{display:flex;align-items:center;gap:12px;padding:8px 10px;background:rgba(7,9,15,.6);border:1px solid rgba(46,230,197,.35);color:var(--ink);text-align:left;cursor:pointer;position:relative;animation:holoin .5s var(--ease) both;animation-delay:var(--d,0ms);transition:border-color .2s,transform .2s,background .2s}
 .holo-card:hover,.holo-card.sel{border-color:var(--accent);background:rgba(46,230,197,.08);transform:translateY(-2px)}
 .hc-img,.hc-ico{width:44px;height:44px;border-radius:50%;object-fit:cover;flex:none;border:1px solid rgba(46,230,197,.5)}
 .hc-k{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}.hc-t{display:block;font-size:12.5px;font-weight:700;line-height:1.3}
