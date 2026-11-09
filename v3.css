@@ -144,11 +144,12 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
 /* while zoomed, the copy column is fully covered by the stage: hide it so keyboard focus cannot land behind the overlay */
 .copy{transition:visibility 0s}body.brain-open .copy{visibility:hidden;transition:visibility 0s .6s}
 /* ===== story as a spine: one glowing cord runs down the section, each chapter is a neuron on it, its text a hologram panel ===== */
-#storyList{position:relative;padding-top:8px}
-#storyList::before{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent) 96%,transparent);opacity:.28;box-shadow:0 0 14px var(--accent)}
-#storyList::after{content:"";position:absolute;left:43px;top:0;bottom:0;width:2px;background:repeating-linear-gradient(180deg,var(--accent) 0 5px,transparent 5px 21px);opacity:.55;mask:linear-gradient(180deg,#000,#000 96%,transparent);-webkit-mask:linear-gradient(180deg,#000,#000 96%,transparent)}
-.stopsec{grid-template-columns:200px minmax(0,1fr);gap:56px;padding:40px 0 72px;border-top:0}
-.stopsec::before{content:"";position:absolute;left:42px;top:0;width:4px;height:72px;border-radius:2px;background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 12px var(--accent);opacity:0;animation:spinePulse 5.2s linear infinite;animation-delay:calc(var(--i,0) * .9s)}
+#storyList{position:relative;padding-top:8px;--spine-x:44px}
+#storyList::before{content:"";position:absolute;left:calc(var(--spine-x) - 1px);top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent) 96%,transparent);opacity:.28;box-shadow:0 0 14px var(--accent)}
+#storyList::after{content:"";position:absolute;left:calc(var(--spine-x) - 1px);top:0;bottom:0;width:2px;background:repeating-linear-gradient(180deg,var(--accent) 0 5px,transparent 5px 21px);opacity:.55;mask:linear-gradient(180deg,#000,#000 96%,transparent);-webkit-mask:linear-gradient(180deg,#000,#000 96%,transparent)}
+.stopsec{grid-template-columns:calc(var(--spine-x) - 44px - 56px) 88px minmax(0,1fr);gap:0 56px;padding:40px 0 72px;border-top:0}
+.stopsec .side{grid-column:2/4;grid-row:1;flex-direction:row;align-items:center;gap:22px}.stopsec .main{grid-column:1;grid-row:1}.stopsec .chap{flex-direction:column;align-items:flex-start;gap:8px}
+.stopsec::before{content:"";position:absolute;left:calc(var(--spine-x) - 2px);top:0;width:4px;height:72px;border-radius:2px;background:linear-gradient(180deg,transparent,var(--accent));box-shadow:0 0 12px var(--accent);opacity:0;animation:spinePulse 5.2s linear infinite;animation-delay:calc(var(--i,0) * .9s)}
 @keyframes spinePulse{0%{transform:translateY(-72px);opacity:0}6%{opacity:.9}40%{transform:translateY(100%);opacity:.9}46%,100%{transform:translateY(100%);opacity:0}}
 .stopsec .bigyear{display:none}
 .stopsec .side{top:104px;gap:12px}
@@ -157,14 +158,14 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
 .stopsec .side>.reveal:first-child::before{content:"";position:absolute;inset:-12px;border-radius:50%;border:1px solid rgba(46,230,197,.4);opacity:0}
 .stopsec.in .side>.reveal:first-child::before{animation:nodeRing 2.6s var(--e) infinite}
 @keyframes nodeRing{0%{transform:scale(.8);opacity:.7}100%{transform:scale(1.35);opacity:0}}
-.stopsec .side>.reveal:first-child::after{content:"";position:absolute;left:calc(100% + 14px);top:50%;width:154px;border-top:1px dashed rgba(46,230,197,.45)}
+.stopsec .side>.reveal:first-child::after{content:"";position:absolute;right:calc(100% + 14px);top:50%;width:42px;border-top:1px dashed rgba(46,230,197,.45)}
 .stopsec .chap{gap:10px}.stopsec .chap .n{border-radius:9px;font-size:10px;padding:2px 7px;box-shadow:0 0 10px rgba(46,230,197,.5)}.stopsec .chap .eyebrow{color:var(--ink2)}
 .stopsec .main{border:1px solid rgba(46,230,197,.2);background:rgba(13,18,32,.45);backdrop-filter:blur(8px);padding:28px 32px 30px;box-shadow:0 0 0 1px rgba(46,230,197,.04),0 40px 90px -50px rgba(46,230,197,.35)}
 .stopsec h2{font-size:30px}.stopsec .kicker{color:var(--accent);margin-bottom:18px}.stopsec .lead{font-size:19px;max-width:none}
 .stopsec .body p{font-size:15px;line-height:1.6;max-width:none;color:var(--ink2)}
 .stats{border:1px solid var(--line);background:rgba(7,9,15,.5)}.stats b{font-size:24px}
-@media (max-width:1000px){#storyList::before,#storyList::after{left:28px}.stopsec::before{left:27px}.stopsec{grid-template-columns:minmax(0,1fr);gap:18px;padding:32px 0 48px}
-  .stopsec .side{flex-direction:row;align-items:center}.stopsec .side>.reveal:first-child{width:56px;height:56px}.stopsec .biglogo{width:56px;height:56px}.stopsec .side>.reveal:first-child::after{display:none}
+@media (max-width:1000px){#storyList{--spine-x:28px}.stopsec{grid-template-columns:minmax(0,1fr);gap:18px;padding:32px 0 48px}
+  .stopsec .side{grid-column:1;grid-row:1}.stopsec .main{grid-row:2}.stopsec .chap{flex-direction:row;align-items:center}.stopsec .side>.reveal:first-child{width:56px;height:56px}.stopsec .biglogo{width:56px;height:56px}.stopsec .side>.reveal:first-child::after{display:none}
   .stopsec .main{padding:18px 18px 20px;margin-left:0}.stopsec h2{font-size:24px}.stopsec .lead{font-size:17px}}
 /* cord between the hero and the spine: same two-layer stroke as the spine (soft glow + vertebra dashes) */
 #story{position:relative}.cord{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible;z-index:0}

@@ -70,11 +70,12 @@
   const fig = (src, b, note) => `<figure class="fig card" data-full="assets/img/${src}"><div class="img"><img src="assets/img/${src}" alt="${esc(b)}" loading="lazy"></div><figcaption class="cap2"><b>${esc(b)}</b><span>${esc(note)}</span></figcaption></figure>`;
   function layoutCord() {
     const svg = $("#cord"), brain = $("#brain"), list = $("#storyList"), sec = $("#story"); if (!svg || !brain || !list) return;
-    if (innerWidth <= 980) { svg.style.display = "none"; return; } svg.style.display = "";
+    if (innerWidth <= 980) { svg.style.display = "none"; list.style.removeProperty("--spine-x"); return; } svg.style.display = "";
     const sr = sec.getBoundingClientRect(), br = brain.getBoundingClientRect(), lr = list.getBoundingClientRect();
-    const x0 = br.left + br.width / 2 - sr.left, x1 = lr.left + 44 - sr.left, h = lr.top - sr.top, bend = Math.min(150, h * .5);
+    const x0 = br.left + br.width / 2 - sr.left, h = lr.top - sr.top;
+    list.style.setProperty("--spine-x", (br.left + br.width / 2 - lr.left) + "px");          // the story spine sits exactly under the brain stem
     svg.setAttribute("viewBox", `0 0 ${Math.round(sr.width)} ${Math.round(h)}`); svg.style.height = h + "px";
-    const d = `M${x0} 0 V${h - bend} C${x0} ${h - bend / 2} ${x1} ${h - bend / 2} ${x1} ${h}`; $$("path", svg).forEach(p => p.setAttribute("d", d));
+    const d = `M${x0} 0 V${h}`; $$("path", svg).forEach(p => p.setAttribute("d", d));
   }
   addEventListener("resize", layoutCord);
   function renderStory() {
