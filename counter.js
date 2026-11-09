@@ -6,7 +6,7 @@
   const post = (body, keepalive = false) => fetch(API + "/hit", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ sid, ...body }), keepalive }).catch(() => {});
   const section = () => { let cur = "hero"; document.querySelectorAll("section[id], article[id]").forEach(s => { if (s.getBoundingClientRect().top < innerHeight * .5) cur = s.id; }); return cur; };
   post({ kind: "view", section: "hero" });
-  const beat = setInterval(() => document.visibilityState === "visible" && post({ kind: "beat" }), 45000);
+  const beat = setInterval(() => document.visibilityState === "visible" && post({ kind: "beat" }), 180000);
   addEventListener("pagehide", () => post({ kind: "end" }, true));
   async function paint() {
     try {
