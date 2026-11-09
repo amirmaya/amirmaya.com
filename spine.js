@@ -1,66 +1,47 @@
-// Spine: the brain stem continues below the hero as a vertebral column drawn in the same material as the brain
-// (points, thin edges, one glowing cord). It sits on the brain's axis, each chapter's neuron is a vertebra on it,
-// and a nerve root branches from the column to each chapter panel. A signal travels down the cord and lights the
-// nerve root it passes. Sticky, viewport-sized canvas: cheap on memory, drawn only while the story is on screen.
+// Spinal column below the hero: the continuation of the brain stem, drawn with the brain's own point cloud, edges and
+// projection (it even sways with the brain). Chapter neurons sit on it; a nerve strand branches to each chapter panel;
+// the neural-link cord runs inside and carries a signal that fires the strands it passes.
 (() => {
   const cv = document.getElementById("spine"), sec = document.getElementById("story"), list = document.getElementById("storyList");
   if (!cv || !sec || !list || !window.BrainInfo) return;
   const ctx = cv.getContext("2d"), dpr = Math.min(2, devicePixelRatio || 1), reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const C = "46,230,197";
   let W = 0, H = 0; const size = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; }; size(); addEventListener("resize", size);
-  const flash = new Map();                                                   // chapter id -> last time the signal passed (s)
+  const flash = new Map();
   function frame(now) {
     requestAnimationFrame(frame); if (document.hidden) return;
-    const t = now / 1000, sr = sec.getBoundingClientRect();
-    if (innerWidth <= 980 || sr.bottom < 0 || sr.top > H) { if (cv.dataset.on) { ctx.clearRect(0, 0, cv.width, cv.height); cv.dataset.on = ""; } return; }
-    const B = BrainInfo(); if (!B.resting) { ctx.clearRect(0, 0, cv.width, cv.height); return; }
-    cv.dataset.on = "1"; const cr = cv.getBoundingClientRect(); ctx.setTransform(dpr, 0, 0, dpr, 0, -cr.top * dpr); ctx.clearRect(0, cr.top, W, H);   // draw in viewport coordinates wherever the sticky canvas sits
-    const x0 = B.x, pitch = B.pitch, r0 = B.r, n = B.n, lr = list.getBoundingClientRect();
-    const yTop = sr.top, yEnd = lr.bottom - 56;                              // viewport y where the column starts (hero edge) and tapers out
-    if (yEnd <= yTop) return;
-    // phase: continue the stem's ring sequence across the hero edge
-    const last = B.rings.length ? B.rings[B.rings.length - 1] : yTop - pitch; let y = last + pitch; while (y < yTop - pitch) y += pitch; let k = B.rings.length;
-    const rot = reduced ? 0 : t * .35, chapters = [...list.querySelectorAll(".stopsec")].map(a => { const d = a.querySelector(".biglogo").getBoundingClientRect(), m = a.querySelector(".main").getBoundingClientRect(); return { id: a.id, y: d.top + d.height / 2, dl: d.right, mr: m.left, in: a.classList.contains("in"), top: a.getBoundingClientRect().top }; });
-    const sigY = reduced ? -1 : yTop + ((t * .09) % 1) * (yEnd - yTop);    // travelling signal (viewport y)
-    const hide = (yy) => chapters.some(c => Math.abs(yy - c.y) < 46);        // the vertebra behind a chapter's neuron disc is the disc itself
-    // --- halo along the column
-    const hg = ctx.createLinearGradient(x0 - r0 * 3.2, 0, x0 + r0 * 3.2, 0); hg.addColorStop(0, `rgba(${C},0)`); hg.addColorStop(.5, `rgba(${C},.07)`); hg.addColorStop(1, `rgba(${C},0)`);
-    ctx.fillStyle = hg; ctx.fillRect(x0 - r0 * 3.2, Math.max(-10, yTop), r0 * 6.4, Math.min(H + 10, yEnd) - Math.max(-10, yTop));
-    // --- column: each vertebra = body (two rings, a short cylinder) + thinner disc; rings turn slowly, slight natural curve, taper at the end
-    let prev = null; const sz = Math.sqrt(B.S / 300);
-    for (; y < yEnd; y += pitch, k++) {
-      const taper = Math.min(1, (yEnd - y) / 300), rr = r0 * taper;
-      const cx = x0 + Math.sin((y - yTop) / 520) * 5 * taper;
-      for (const [dy, ww, kind] of [[0, 1, "body"], [.42, 1, "body"], [.72, .6, "disc"]]) {
-        const yy = y + dy * pitch, R = rr * ww, ry = R * .36, P = [];
-        for (let i = 0; i < n; i++) { const a = i / n * 6.2832 + rot; P.push({ X: cx + Math.cos(a) * R, Y: yy + Math.sin(a) * ry, d: (Math.sin(a) + 1) / 2 }); }
-        const vis = yy > -40 && yy < H + 40 && !hide(yy), fire = Math.max(0, 1 - Math.abs(sigY - yy) / 70);
-        if (vis) {
-          const al = (kind === "body" ? .24 : .16) * taper + fire * .5;
-          ctx.lineWidth = 1; ctx.beginPath(); P.forEach((q, i) => i ? ctx.lineTo(q.X, q.Y) : ctx.moveTo(q.X, q.Y)); ctx.closePath(); ctx.strokeStyle = `rgba(${C},${al})`; ctx.stroke();
-          if (prev && !hide(prev.y)) { const full = kind === "body" && prev.kind === "body" && prev.k === k; ctx.beginPath(); for (let i = 0; i < n; i += full ? 1 : 2) { ctx.moveTo(prev.P[i].X, prev.P[i].Y); ctx.lineTo(P[i].X, P[i].Y); } ctx.strokeStyle = `rgba(${C},${(full ? .2 : .1) * taper + fire * .3})`; ctx.stroke(); }
-          P.forEach(q => { ctx.fillStyle = `rgba(${C},${Math.min(1, (.3 + q.d * .55) * taper + fire * .4)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, (1 + q.d) * sz * (kind === "body" ? 1 : .8), 0, 6.283); ctx.fill(); });
-          if (kind === "body" && dy > 0) { const ym = yy - .21 * pitch; ctx.beginPath(); ctx.moveTo(cx - R, ym); ctx.lineTo(cx - R * 1.9, ym); ctx.moveTo(cx + R, ym); ctx.lineTo(cx + R * 1.9, ym); ctx.strokeStyle = `rgba(${C},${.2 * taper + fire * .3})`; ctx.stroke();
-            for (const ex of [cx - R * 1.9, cx + R * 1.9]) { ctx.fillStyle = `rgba(${C},${.6 * taper})`; ctx.beginPath(); ctx.arc(ex, ym, 1.3 * sz, 0, 6.283); ctx.fill(); } }
-        }
-        prev = { P, kind, k, y: yy };
-      }
+    const t = now / 1000, sr = sec.getBoundingClientRect(), cr = cv.getBoundingClientRect();
+    const off = () => { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height); };
+    if (innerWidth <= 980 || sr.bottom < 0 || sr.top > H) { off(); return; }
+    const B = BrainInfo(); if (!B.resting) { off(); return; }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, -cr.top * dpr); ctx.clearRect(0, cr.top, W, H);
+    const r = B.rect, S = B.S, lr = list.getBoundingClientRect();
+    const toV = q => ({ X: q.X + r.left, Y: q.Y + r.top, z: q.z, f: q.f });                            // stage -> viewport
+    const sOf = yv => (yv - r.top - B.cY) / S + B.STEM.top;                                             // page y -> arc length (yaw does not move y)
+    const sEnd = sOf(lr.bottom - 70), s0 = Math.max(sOf(Math.max(sr.top, -30)), 0), s1 = Math.min(sOf(H + 30), sEnd);
+    if (s1 <= s0) return;
+    const pts = B.pts; let from = 0, to = pts.length; { let lo = 0, hi = pts.length; while (lo < hi) { const m = (lo + hi) >> 1; pts[m].s < s0 - .3 ? lo = m + 1 : hi = m; } from = lo; lo = from; hi = pts.length; while (lo < hi) { const m = (lo + hi) >> 1; pts[m].s < s1 + .3 ? lo = m + 1 : hi = m; } to = lo; }
+    const taper = s => Math.max(0, Math.min(1, (sEnd - s) / 1.4));
+    const P = []; for (let i = from; i < to; i++) { const p = pts[i], tp = taper(p.s); P.push(toV(B.proj(B.point(p, .15 + .85 * tp)))); }
+    const sig = B.sigS(t);
+    B.draw(ctx, P, pts, B.edges, from, to, i => (pts[i].s < s0 - .25 ? 0 : 1) * (.25 + .75 * taper(pts[i].s)), i => Math.max(0, 1 - Math.abs(pts[i].s - sig) / .14) * taper(pts[i].s));
+    // cord: the neural link, fading out with the column
+    ctx.save(); ctx.lineWidth = 1.6; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10;
+    const cs = Math.max(0, s0 - .2), ce = Math.min(sEnd, s1 + .2), a0 = B.axisAt(cs), q0 = toV(B.proj({ x: a0.x, y: B.STEM.top - cs, z: a0.z })), a1 = B.axisAt(ce), q1 = toV(B.proj({ x: a1.x, y: B.STEM.top - ce, z: a1.z }));
+    const g = ctx.createLinearGradient(0, q0.Y, 0, q1.Y); g.addColorStop(0, "rgba(46,230,197,.5)"); g.addColorStop(Math.max(0, Math.min(1, (ce - cs - 1.2) / (ce - cs))), "rgba(46,230,197,.5)"); g.addColorStop(1, "rgba(46,230,197,0)"); ctx.strokeStyle = g;
+    ctx.beginPath(); for (let ss = cs, first = true; ss <= ce; ss += .2) { const a = B.axisAt(ss), q = toV(B.proj({ x: a.x, y: B.STEM.top - ss, z: a.z })); first ? ctx.moveTo(q.X, q.Y) : ctx.lineTo(q.X, q.Y); first = false; } ctx.stroke(); ctx.restore();
+    // nerve strands: from the column's surface at each chapter to the chapter panel
+    for (const a of list.querySelectorAll(".stopsec")) {
+      const d = a.querySelector(".biglogo").getBoundingClientRect(), m = a.querySelector(".main").getBoundingClientRect(), yc = d.top + d.height / 2; if (yc < -80 || yc > H + 80) continue;
+      const sc = sOf(yc); if (Math.abs(sig - sc) < .12) flash.set(a.id, t);
+      const f = Math.max(0, 1 - (t - (flash.get(a.id) ?? -9)) / 1.6), on = a.classList.contains("in"), base = on ? .9 : .5;
+      const x1 = d.right + 2, x2 = m.left - 2, n = 9, pts2 = [];
+      for (let i = 0; i <= n; i++) { const u = i / n, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2 + Math.sin(t * 1.3 + u * 6) * .8; pts2.push({ X, Y, z: Math.sin(u * 3.1416) * .4 - .2, f: 1 }); }
+      for (let i = 1; i <= n; i++) { const p = pts2[i - 1], q = pts2[i], al = (.12 + .25 * (1 - i / n)) * base + f * .4; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .9; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
+      pts2.forEach((q, i) => { const al = (.35 + .4 * (1 - i / n)) * base + f * .5, rr = (.7 + (1 - i / n) * .9) * (1 + f * .8); ctx.fillStyle = `rgba(124,156,255,${(al * .2).toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr * 3, 0, 6.283); ctx.fill(); ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr, 0, 6.283); ctx.fill(); });
+      if (f > 0) { const u = 1 - f, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2; ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18 * f; ctx.fillStyle = `rgba(220,255,247,${(.95 * f).toFixed(2)})`; ctx.beginPath(); ctx.arc(X, Y, 2.4, 0, 6.283); ctx.fill(); ctx.restore(); }
     }
-    // --- cord
-    const g = ctx.createLinearGradient(0, yEnd - 220, 0, yEnd); g.addColorStop(0, `rgba(${C},.55)`); g.addColorStop(1, `rgba(${C},0)`);
-    ctx.save(); ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.shadowColor = `rgba(${C},.9)`; ctx.shadowBlur = 12; ctx.beginPath(); ctx.moveTo(x0, Math.max(-10, yTop)); ctx.lineTo(x0, Math.min(H + 10, yEnd)); ctx.stroke(); ctx.restore();
-    // --- nerve roots: column -> chapter panel, brighter while the chapter is in view, flashing when the signal passes
-    for (const c of chapters) {
-      if (c.y < -80 || c.y > H + 80) continue;
-      if (Math.abs(sigY - c.y) < 10) flash.set(c.id, t);
-      const f = Math.max(0, 1 - (t - (flash.get(c.id) ?? -9)) / 1.6), a = (c.in ? .5 : .22) + f * .5;
-      const x1 = c.dl + 2, x2 = c.mr - 2, ym = c.y;                          // from the disc's right edge to the panel's left edge
-      for (const dy of [-5, 5]) { ctx.beginPath(); ctx.moveTo(x1, ym + dy * .3); ctx.bezierCurveTo(x1 - (x1 - x2) * .45, ym + dy * 1.6, x2 + (x1 - x2) * .3, ym + dy, x2, ym + dy * .6); ctx.strokeStyle = `rgba(${C},${a})`; ctx.lineWidth = 1; ctx.stroke(); }
-      for (let i = 1; i <= 4; i++) { const u = i / 5, X = x1 + (x2 - x1) * u; ctx.fillStyle = `rgba(${C},${a})`; ctx.beginPath(); ctx.arc(X, ym + Math.sin(u * 3.14) * 1.5, 1.4 + f, 0, 6.283); ctx.fill(); }
-      if (f > 0) { ctx.save(); ctx.shadowColor = `rgba(${C},1)`; ctx.shadowBlur = 18 * f; ctx.fillStyle = `rgba(220,255,247,${.9 * f})`; ctx.beginPath(); ctx.arc(x1 - (x1 - x2) * (1 - f), ym, 2.4, 0, 6.283); ctx.fill(); ctx.restore(); }
-    }
-    // --- signal on the cord
-    if (sigY > -10 && sigY < H + 10) { ctx.save(); ctx.shadowColor = `rgba(${C},1)`; ctx.shadowBlur = 16; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(x0, sigY, 2.6, 0, 6.283); ctx.fill(); const tr = ctx.createLinearGradient(0, sigY - 90, 0, sigY); tr.addColorStop(0, `rgba(${C},0)`); tr.addColorStop(1, `rgba(${C},.8)`); ctx.strokeStyle = tr; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x0, sigY - 90); ctx.lineTo(x0, sigY); ctx.stroke(); ctx.restore(); }
+    // the signal on the cord
+    if (!reduced && sig > s0 && sig < Math.min(s1, sEnd)) { const a = B.axisAt(sig), q = toV(B.proj({ x: a.x, y: B.STEM.top - sig, z: a.z })); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); }
   }
   requestAnimationFrame(frame);
 })();
