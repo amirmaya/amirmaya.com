@@ -224,3 +224,17 @@ body.gal-open{overflow:hidden}
 /* the stimulus probe follows the pointer over the whole page */
 .probe{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:300;mix-blend-mode:screen}
 @media (pointer:coarse){.probe{display:none}}
+/* tool cards: screenshot on top, then the story of the tool */
+.tool{grid-template-columns:1fr}.tool .shot{min-height:0;aspect-ratio:16/9;border-right:0;border-bottom:1px solid var(--line)}.tool .txt{padding:22px 24px 24px}.tool .txt p{font-size:15px;color:var(--ink2)}
+.tbul{margin:12px 0 0;display:grid;gap:8px}.tbul li{font-size:13.5px;line-height:1.55;color:var(--ink2)}
+.edu-item p:empty{display:none}
+/* mobile key: the five stops listed under the brain, since labels do not fit next to the neurons on a phone */
+.mkey{display:none}
+@media (max-width:620px){
+  .neuron .lbl{display:none}.neuron .disc{width:44px;height:44px}.neuron .cnt{min-width:18px;height:18px;font-size:9px;right:-6px;top:-6px}
+  .legend{display:none}.mkey{display:flex;flex-wrap:wrap;gap:4px 12px;position:absolute;left:14px;right:14px;bottom:10px;font:500 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}.mkey b{color:var(--accent);margin-right:2px}
+  .hud>*{padding:5px 8px;gap:4px}.hud .dstat b{font-size:12px}.hud .dstat span{font-size:8.5px}
+  .section{padding-top:64px}#story .wrap{padding-top:64px}.section-title{font-size:30px}.section-intro{font-size:15px}
+  .duty-facts div:nth-child(n+4){display:none}.photo{width:52px;height:52px}
+  .stopsec .main{padding:16px}.stopsec h2{font-size:22px}.stopsec .lead{font-size:16px}.tool .txt{padding:16px}
+}

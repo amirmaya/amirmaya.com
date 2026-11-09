@@ -110,7 +110,7 @@
   /* Rest fit: the brain rotates continuously, so size it to the largest footprint over a full turn (points + neuron boxes),
      then centre that footprint in the stage, leaving room for the HUD strip at the top and the legend at the bottom. */
   function restFit(w, h) {
-    const PAD = { top: 44, bottom: 62, side: 10 }, NB = { x: 68, yTop: 38, yBot: 74 }; // stage margins (HUD / legend), neuron box around its anchor
+    const narrow = innerWidth <= 620, PAD = narrow ? { top: 46, bottom: 40, side: 8 } : { top: 44, bottom: 62, side: 10 }, NB = narrow ? { x: 26, yTop: 26, yBot: 26 } : { x: 68, yTop: 38, yBot: 74 }; // stage margins (HUD / legend), neuron box around its anchor
     let xa = 0, ya = 0, yaN = 0, xp = 0, yp = 0, ypN = 0;                             // unit extents (symmetric in x after the sweep)
     const samp = pts.filter((_, i) => i % 7 === 0);
     for (let ry = -.78; ry <= .1; ry += .08) for (const rx of [-.05, .12, .3]) {        // idle sway ±.22 + pointer ±.15 around -.35
@@ -161,6 +161,7 @@
 
   /* ---- neurons ---- */
   function buildNeurons() {
+    const mk = $("#mkey"); if (mk) mk.innerHTML = C().stops.map((s, i) => `<span><b>${String(i + 1).padStart(2, "0")}</b> ${esc(s.name)}</span>`).join("");
     $("#neurons").innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span><span class="cnt">${String(i + 1).padStart(2, "0")}</span><span class="lbl"><b>${esc(s.name)}</b><span>${esc(s.years)}</span></span></a>`).join("");
     const tip = $("#tip");
     $$(".neuron").forEach(el => {
