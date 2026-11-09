@@ -37,7 +37,7 @@ main{transition:opacity .22s}main.switching{opacity:0}
 .hero-in{padding-top:16px;padding-bottom:48px;display:flex;flex-direction:column;gap:8px}
 .hero-top{display:flex;flex-direction:column;gap:14px}
 .hl-wrap{display:flex;flex-direction:column;gap:8px}
-.hl{font-size:clamp(24px,2.8vw,40px);min-height:1.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .35s,transform .35s var(--ease)}.hl.is-fading{opacity:0;transform:translateY(6px)}
+.hl{font-size:clamp(22px,2.5vw,36px);min-height:1.05em;white-space:normal;max-width:30ch;line-height:1.1;transition:opacity .35s,transform .35s var(--ease)}.hl.is-fading{opacity:0;transform:translateY(6px)}
 .hl-dots{display:flex;gap:6px}.hl-dot{width:22px;height:22px;border:0;background:transparent;cursor:pointer;display:grid;place-items:center;padding:0}.hl-dot::before{content:"";width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted);transition:transform .2s,background .2s,border-color .2s}.hl-dot:hover::before{border-color:var(--ink);transform:scale(1.2)}.hl-dot.on::before{background:var(--accent);border-color:var(--accent)}
 .hero-body{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:40px 72px;border-top:1.5px solid var(--line);padding-top:40px;margin-top:10px}
 .hero-left{flex:1 1 520px;display:flex;flex-direction:column;gap:30px}
