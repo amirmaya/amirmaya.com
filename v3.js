@@ -103,6 +103,7 @@
   function render(first) {
     document.documentElement.lang = lang;
     $$("[data-ui]").forEach(el => { el.textContent = C().ui[el.dataset.ui] ?? ""; });
+    $$("[data-ui-title]").forEach(el => { el.title = C().ui[el.dataset.uiTitle] ?? ""; });
     $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
     renderStory(); if (window.BrainRender) BrainRender();
     $("#year").textContent = new Date().getFullYear();

@@ -11,7 +11,7 @@
   async function paint() {
     try {
       const r = await fetch(API + "/stats"); const d = await r.json();
-      const f = n => String(n).padStart(4, "0");
+      const f = n => Number(n || 0).toLocaleString("en-US");
       const el = $("#door"); if (!el) return;
       el.querySelector("[data-k=today]").textContent = f(d.today || 0);
       el.querySelector("[data-k=online]").textContent = d.online || 1;

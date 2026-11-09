@@ -34,7 +34,7 @@ window.CONTENT = {
     headlines: ["There's always a better way to do things.", "Account manager at Amazon who also builds the tools his team uses.", "Built Hype Merch from zero: 200M+ TRY GMV, 40K+ sales, 55K users.", "Now at Amazon, growing strategic sellers in 3P Softlines.", "Product thinking, execution, and work that moves the needle."],
     duty_facts: [["Now", "Strategic Account Services, Amazon Turkey 3P · Softlines"], ["Focus", "Strategic accounts · seller growth · internal tooling"], ["Speaks", "Turkish (native) · English (native) · Hebrew (intermediate) · Spanish (beginner)"], ["Base", "Istanbul"]],
     ui: { story: "Story", facts: "Profile", role_short: "Marketplace consultant", eyebrow: "My career, laid out as a route", cta_story: "Walk the route", cv: "Resume (PDF)", duty: "Account manager on duty", live: "Available",
-          route_eyebrow: "00 · Route", g_all: "Everything", g_l0: "Education", g_l1: "Career", g_l2: "Tools & products", g_l3: "Proof", g_verify: "Verify", g_read: "Read the chapter", g_hint: "Click a stop to open what came out of it.", g_desktop: "Desktop tools", g_bots: "Discord bots", door: "Live · Visitor count", door_today: "today", door_now: "online now", door_avg: "avg. visit", door_note: "Anonymous · no cookies", s1_eyebrow: "01 · Story · Stop by stop", s1_title: "Stop by stop.", s1_intro: "Each stop is its own chapter: what I did there, what it taught me, and what I built because of it.",
+          route_eyebrow: "00 · Route", g_all: "Everything", g_l0: "Education", g_l1: "Career", g_l2: "Tools & products", g_l3: "Proof", g_verify: "Verify", g_read: "Read the chapter", g_hint: "Click a stop to open what came out of it.", g_desktop: "Desktop tools", g_bots: "Discord bots", door: "Visitor count", door_today: "today", door_now: "online now", door_avg: "avg. visit", door_note: "Anonymous · no cookies", s1_eyebrow: "01 · Story · Stop by stop", s1_title: "Stop by stop.", s1_intro: "Each stop is its own chapter: what I did there, what it taught me, and what I built because of it.",
           s3_eyebrow: "03 · Profile · Details", s3_title: "The details.", education: "Education", skills: "What I do", s2_eyebrow: "02 · Education", s4_eyebrow: "04 · Contact · Register", work: "Work", contact: "Contact", scroll: "Scroll", hover: "Hover a stop. Scroll to read it in order.",
           intro: "Twelve years, seven stops. Each one taught me the next.", role: "Seller growth · marketplace tooling",
           press: "In the press", awards: "Recognition", apps: "App Store", tools: "Built here", internships: "Internships along the way",
@@ -44,7 +44,14 @@ window.CONTENT = {
     stops: [
       { id: "deloitte", years: "2019 – 2020", logo: "tiles/deloitte.png", name: "Deloitte", kicker: "Audit Assistant · Istanbul",
         lead: "Audit across telecom, retail, manufacturing, packaging and automotive. Financial statements, journal entries, internal controls.",
-        body: ["Six months of reading other people's systems closely. Useful later, when I started building my own."] },
+        body: ["Six months of reading other people's systems closely. Useful later, when I started building my own."],
+        nodes: [
+          { v: "6 mo", n: "Audit assistant", d: "Six months inside a Big Four audit team, reading other people's systems closely." },
+          { v: "5", n: "Industries", d: "Telecom, retail, manufacturing, packaging and automotive." },
+          { v: "FS", n: "Financial statements", d: "Testing the numbers companies publish against the records behind them." },
+          { v: "JE", n: "Journal entries", d: "Sampling and tracing bookings back to source documents." },
+          { v: "IC", n: "Internal controls", d: "Walking through how a company stops its own mistakes before they reach the books." }
+        ] },
       { id: "coursera", years: "2019 – 2020", logo: "tiles/coursera.png", name: "Coursera", kicker: "Self-taught · nights and weekends",
         lead: "Python for Everybody, Data Structures, Web Data, Databases (University of Michigan). Swift 5 & iOS (LearnQuest). Git & GitHub (Google). MongoDB.",
         body: ["Learned at night, applied the next morning. The next two stops only exist because of this one."] },
@@ -124,7 +131,7 @@ window.CONTENT = {
     headlines: ["Her işin daha iyi bir yolu vardır.", "Amazon'da hesap yöneticisi; ekibinin kullandığı araçları da kuran.", "Hype Merch'i sıfırdan kurdum: 200M+ TL GMV, 40K+ satış, 55K kullanıcı.", "Şimdi Amazon'da, 3P Softlines'ta stratejik satıcıları büyütüyorum.", "Ürün düşüncesi, icraat ve gerçekten fark yaratan işler."],
     duty_facts: [["Şimdi", "Strategic Account Services, Amazon Türkiye 3P · Softlines"], ["Odak", "Stratejik hesaplar · satıcı büyümesi · dahili araçlar"], ["Diller", "Türkçe (ana dil) · İngilizce (ana dil) · İbranice (orta) · İspanyolca (başlangıç)"], ["Üs", "İstanbul"]],
     ui: { story: "Hikâye", facts: "Profil", role_short: "Marketplace danışmanı", eyebrow: "Kariyerim, bir rota olarak", cta_story: "Rotayı yürü", cv: "Özgeçmiş (PDF)", duty: "Nöbetçi hesap yöneticisi", live: "Müsait",
-          route_eyebrow: "00 · Rota", g_all: "Hepsi", g_l0: "Eğitim", g_l1: "Kariyer", g_l2: "Araçlar & ürünler", g_l3: "Kanıt", g_verify: "Doğrula", g_read: "Bölümü oku", g_hint: "Bir durağa tıkla; oradan çıkanlar açılır.", g_desktop: "Masaüstü araçlar", g_bots: "Discord botları", door: "Canlı · Ziyaretçi sayısı", door_today: "bugün", door_now: "şu an online", door_avg: "ort. ziyaret", door_note: "Anonim · çerez yok", s1_eyebrow: "01 · Hikâye · Durak durak", s1_title: "Durak durak.", s1_intro: "Her durak kendi bölümü: orada ne yaptım, bana ne öğretti, bu yüzden ne kurdum.",
+          route_eyebrow: "00 · Rota", g_all: "Hepsi", g_l0: "Eğitim", g_l1: "Kariyer", g_l2: "Araçlar & ürünler", g_l3: "Kanıt", g_verify: "Doğrula", g_read: "Bölümü oku", g_hint: "Bir durağa tıkla; oradan çıkanlar açılır.", g_desktop: "Masaüstü araçlar", g_bots: "Discord botları", door: "Ziyaretçi sayısı", door_today: "bugün", door_now: "şu an online", door_avg: "ort. ziyaret", door_note: "Anonim · çerez yok", s1_eyebrow: "01 · Hikâye · Durak durak", s1_title: "Durak durak.", s1_intro: "Her durak kendi bölümü: orada ne yaptım, bana ne öğretti, bu yüzden ne kurdum.",
           s3_eyebrow: "03 · Profil · Detaylar", s3_title: "Detaylar.", education: "Eğitim", skills: "Ne yaparım", s2_eyebrow: "02 · Eğitim", s4_eyebrow: "04 · İletişim · Kasa", work: "İşler", contact: "İletişim", scroll: "Kaydır", hover: "Bir durağın üzerine gel. Sırayla okumak için kaydır.",
           intro: "On iki yıl, yedi durak. Her biri bir sonrakini öğretti.", role: "Satıcı büyümesi · marketplace araçları",
           press: "Basında", awards: "Takdir", apps: "App Store", tools: "Burada kuruldu", internships: "Yol üstü stajlar",
@@ -134,7 +141,14 @@ window.CONTENT = {
     stops: [
       { id: "deloitte", years: "2019 – 2020", logo: "tiles/deloitte.png", name: "Deloitte", kicker: "Denetim Asistanı · İstanbul",
         lead: "Telekom, perakende, üretim, ambalaj ve otomotivde denetim. Mali tablolar, yevmiye kayıtları, iç kontroller.",
-        body: ["Altı ay başkalarının sistemlerini yakından okumak. Sonra kendi sistemlerimi kurarken işe yaradı."] },
+        body: ["Altı ay başkalarının sistemlerini yakından okumak. Sonra kendi sistemlerimi kurarken işe yaradı."],
+        nodes: [
+          { v: "6 ay", n: "Denetim asistanı", d: "Bir Big Four denetim ekibinde altı ay; başkalarının sistemlerini yakından okumak." },
+          { v: "5", n: "Sektör", d: "Telekom, perakende, üretim, ambalaj ve otomotiv." },
+          { v: "MT", n: "Mali tablolar", d: "Şirketlerin yayımladığı rakamları arkasındaki kayıtlarla test etmek." },
+          { v: "YK", n: "Yevmiye kayıtları", d: "Kayıtları örnekleyip kaynak belgelere kadar izlemek." },
+          { v: "İK", n: "İç kontroller", d: "Bir şirketin kendi hatalarını defterlere ulaşmadan nasıl yakaladığını adım adım görmek." }
+        ] },
       { id: "coursera", years: "2019 – 2020", logo: "tiles/coursera.png", name: "Coursera", kicker: "Kendi kendine · geceler ve hafta sonları",
         lead: "Python for Everybody, Data Structures, Web Data, Databases (Michigan Üniversitesi). Swift 5 & iOS (LearnQuest). Git & GitHub (Google). MongoDB.",
         body: ["Gece öğrenildi, sabah uygulandı. Sonraki iki durak yalnızca bu durak sayesinde var."] },

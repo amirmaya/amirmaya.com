@@ -4,7 +4,7 @@
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const C = () => CONTENT[document.documentElement.lang || "en"];
-  const UI_EXTRA = { en: { v3_signal: "Signal", v3_hint: "Click a neuron to zoom in. Esc to zoom out.", v3_back: "Zoom out", v3_none: "Nothing attached here yet." }, tr: { v3_signal: "Sinyal", v3_hint: "Yaklaşmak için bir nörona tıkla. Esc ile geri çık.", v3_back: "Uzaklaş", v3_none: "Buraya bağlı bir şey yok." } };
+  const UI_EXTRA = { en: { v3_signal: "Signal", v3_hint: "Click a neuron to zoom in. Esc to zoom out.", v3_back: "Zoom out", v3_none: "Nothing attached here yet.", v3_pick: "Pick a satellite to read it." }, tr: { v3_signal: "Sinyal", v3_hint: "Yaklaşmak için bir nörona tıkla. Esc ile geri çık.", v3_back: "Uzaklaş", v3_none: "Buraya bağlı bir şey yok.", v3_pick: "Okumak için bir uyduya tıkla." } };
   const ui = () => ({ ...C().ui, ...UI_EXTRA[document.documentElement.lang || "en"] });
 
   /* ---- headline typing ---- */
@@ -16,16 +16,19 @@
   function childrenOf(id) {
     const c = C(), s = c.stops.find(x => x.id === id); if (!s) return [];
     const certIcon = o => /Michigan/.test(o) ? "tiles/umich.png" : /Google/.test(o) ? "tiles/google.png" : /MongoDB/.test(o) ? "tiles/mongodb.png" : "tiles/coursera.png";
-    if (id === "amazon") return [
+    // numbers under the heading become text satellites; explicit nodes (Deloitte) too
+    const stats = (s.stats || []).filter(([v]) => !/^Discord$/.test(v)).map(([v, l, d]) => ({ k: l, t: v, val: v, sl: l, d: d || s.lead }));
+    const nodes = (s.nodes || []).map(x => ({ k: s.name, t: x.n, val: x.v, sl: x.n, d: x.d }));
+    if (id === "amazon") return [...stats,
       ...(s.tools || []).map(t => ({ k: c.ui.tools, t: t.name, logo: t.icon, d: t.d, img: t.img, blur: true })),
       { k: s.small_title, t: ui().g_desktop || "Desktop tools", logo: "tiles/sweep.png", d: s.small_sub, list: (s.small || []).map(x => [x.n, x.d]) },
       ...(s.awards || []).map(a => ({ k: c.ui.awards, t: a.note, img: a.img, d: a.note })) ];
-    if (id === "hypemerch") return [
+    if (id === "hypemerch") return [...stats,
       ...(s.press || []).map(p => ({ k: c.ui.press, t: p.outlet, img: p.img, d: p.note })),
       { k: "App Store", t: "Hype-Merch app", img: (s.apps || [{}])[0].img, d: s.body[1], imgs: (s.apps || []).map(a => a.img) } ];
     if (id === "coursera") return c.me.certs.map(x => ({ k: x.o, t: x.t, logo: certIcon(x.o), d: x.d, link: x.u }));
-    if (id === "trnotify") return [{ k: "Discord · 2020", t: ui().g_bots || "Discord bots", logo: "tiles/bots.png", d: s.lead }];
-    return [];
+    if (id === "trnotify") return [...stats, { k: "Discord · 2020", t: ui().g_bots || "Discord bots", logo: "tiles/bots.png", d: s.lead }];
+    return [...stats, ...nodes];
   }
 
   /* ---- point cloud ---- */
@@ -63,7 +66,7 @@
 
   /* ---- neurons ---- */
   function buildNeurons() {
-    $("#neurons").innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span><span class="lbl"><b>${esc(s.name)}</b><span>${esc(s.years)}</span></span></a>`).join("");
+    $("#neurons").innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${esc(s.name)}"></span>${childrenOf(s.id).length ? `<span class="cnt">${childrenOf(s.id).length}</span>` : ""}<span class="lbl"><b>${esc(s.name)}</b><span>${esc(s.years)}</span></span></a>`).join("");
     const tip = $("#tip");
     $$(".neuron").forEach(el => {
       el.addEventListener("click", e => { e.preventDefault(); const i = +el.dataset.i; focus === i ? unfocus() : focusOn(i); });
@@ -98,28 +101,62 @@
       <div class="holo-panel">
         <div class="holo-head"><span class="eyebrow">${esc(s.kicker)}</span><h3>${esc(s.name)} <span class="mono">${esc(s.years)}</span></h3><p>${esc(s.lead)}</p>
           <div class="holo-acts"><a class="btn btn-ink" href="#${s.id}" data-read>${esc(u.g_read)} ↓</a></div></div>
-        <div class="holo-grid">${kids.length ? kids.map((k, j) => `<button class="holo-card" style="--d:${260 + j * 60}ms" data-j="${j}">${k.img ? `<img class="hc-img" src="assets/img/${k.img}" alt="">` : `<img class="hc-ico" src="assets/logos/${k.logo}" alt="">`}<span><span class="hc-k">${esc(k.k)}</span><b class="hc-t">${esc(k.t)}</b></span></button>`).join("") : `<p class="eyebrow">${esc(u.v3_none)}</p>`}</div>
-        <div class="holo-detail" id="holoDetail"></div>
+        <div class="holo-chips"></div>
+        <div class="holo-detail" id="holoDetail"><p class="holo-empty">${kids.length ? esc(u.v3_pick) : esc(u.v3_none)}</p></div>
         <nav class="holo-nav">${C().stops.map((x, j) => `<button class="hn ${j === i ? "on" : ""}" data-n="${j}" title="${esc(x.name)}"><img src="assets/logos/${x.logo}" alt=""></button>`).join("")}</nav>
       </div>`;
     holo.classList.add("on");
     $("[data-back]", holo).onclick = unfocus;
     $("[data-read]", holo).onclick = ev => { ev.preventDefault(); unfocus(); setTimeout(() => $("#" + s.id).scrollIntoView({ behavior: reduced ? "auto" : "smooth" }), 650); };
-    $$(".holo-card", holo).forEach(btn => btn.onclick = () => showDetail(kids[+btn.dataset.j], btn));
+    renderSats(kids);
     $$(".hn", holo).forEach(btn => btn.onclick = () => focusOn(+btn.dataset.n));
     placePanel();
   }
-  function unfocus() { if (focus === null) return; focus = null; tRotY = -.35; tRotX = .12; $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; collapse(); }
+  let sats = [];
+  function renderSats(kids) {
+    const narrow = matchMedia("(max-width:980px)").matches, item = (k, j, cls) => { const lab = k.sl || k.t; return `<button class="${cls}" style="--d:${320 + j * 55}ms" data-j="${j}" title="${esc(k.t)}">${k.val ? `<span class="sd sv">${esc(k.val)}</span>` : `<span class="sd"><img src="${k.img ? "assets/img/" + k.img : "assets/logos/" + k.logo}" alt=""></span>`}<span class="sl">${esc(lab.length > 18 ? lab.slice(0, 17) + "…" : lab)}</span></button>`; };
+    // wide screens: satellites float around the neuron; narrow screens: the same items as a chip strip inside the panel
+    $("#sats").innerHTML = narrow ? "" : kids.map((k, j) => item(k, j, "sat")).join("");
+    const strip = $(".holo-chips"); if (strip) strip.innerHTML = narrow ? kids.map((k, j) => item(k, j, "chip")).join("") : "";
+    sats = $$(".sat"); if (sats.length) measureSats();
+    $$(".sat, .chip").forEach(el => el.onclick = () => { $$(".sat, .chip").forEach(x => x.classList.toggle("on", x === el)); showDetail(kids[+el.dataset.j], null); });
+  }
+  let satW = 120, satH = 66;
+  function measureSats() { satW = Math.max(60, ...sats.map(e => e.offsetWidth)) + 6; satH = Math.max(40, ...sats.map(e => e.offsetHeight)) + 6; }
+  function placeSats(a, t) {
+    // Satellites sit on a ring around the focused neuron. The ring leaves a gap on the right (towards the panel) so the
+    // dashed connector has room and no satellite ever slides under the panel; the radius adapts to the free space so
+    // neighbours never touch and the ring is never squashed against an edge.
+    const n = sats.length; if (!n) return;
+    const panel = $(".holo-panel"), wr = wrap.getBoundingClientRect();
+    const pl = panel ? panel.getBoundingClientRect().left - wr.left : W;                  // panel's left edge, stage coords
+    const up = a.Y - satH / 2 - 8, down = H - satH / 2 - 8 - a.Y, left = (a.X - satW / 2 - 8) / 1.25, room = pl - satW / 2 - 8 - a.X;
+    const fit = Math.max(90, Math.min(up, down, left));                                       // largest ring that stays on screen
+    let R0 = Math.min(fit, Math.min(W, H) * .20 * Math.sqrt(zoom / 2.4) + 48), alt = 28, gap = 45, step = 0;
+    for (let k = 0; k < 3; k++) {
+      const RX = (R0 + alt) * 1.25;
+      gap = room >= RX ? 45 : Math.max(45, Math.acos(Math.max(-1, Math.min(1, room / RX))) * 180 / Math.PI);
+      step = n > 1 ? (360 - 2 * gap) / (n - 1) : 0;
+      const chord = n > 1 ? 2 * R0 * Math.sin(step / 2 * Math.PI / 180) : 1e9, need = Math.max(satW / 1.25, satH) + 4;
+      if (chord >= need) break;
+      const want = need / (2 * Math.sin(step / 2 * Math.PI / 180));
+      if (want + alt <= fit) R0 = want; else { R0 = Math.max(90, fit - alt); alt = Math.min(44, Math.max(0, fit - R0)); }
+    }
+    sats.forEach((el, j) => { const base = n === 1 ? 180 : gap + j * step; const ang = (base + Math.sin(t * .6 + j) * 2) * Math.PI / 180; const R = R0 + (j % 2) * alt;
+      const x = a.X + Math.cos(ang) * R * 1.25, y = a.Y + Math.sin(ang) * R;
+      el.style.left = Math.min(pl - satW / 2 - 8, Math.max(satW / 2 + 8, x)) + "px"; el.style.top = Math.min(H - satH / 2 - 8, Math.max(satH / 2 + 8, y)) + "px"; });
+  }
+  function unfocus() { if (focus === null) return; focus = null; tRotY = -.35; tRotX = .12; $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; $("#sats").innerHTML = ""; sats = []; collapse(); }
   function placePanel() { /* panel is CSS-positioned; nothing dynamic */ }
   const placeHolo = placePanel;
   function showDetail(k, btn) {
-    const d = $("#holoDetail"), u = ui(); $$(".holo-card").forEach(x => x.classList.toggle("sel", x === btn));
+    const d = $("#holoDetail"), u = ui();
     const imgs = k.imgs || (k.img ? [k.img] : []);
     d.innerHTML = `<button class="hd-close" aria-label="Close">×</button><span class="eyebrow">${esc(k.k)}</span><b>${esc(k.t)}</b><p>${esc(k.d || "")}</p>
       ${k.list ? `<ul>${k.list.map(([a, b2]) => `<li><b>${esc(a)}</b> ${esc(b2)}</li>`).join("")}</ul>` : ""}
       ${imgs.length ? `<div class="hd-imgs">${imgs.map(i => `<img src="assets/img/${i}" alt="" data-full="assets/img/${i}">`).join("")}</div>` : ""}
       ${k.blur ? `<span class="eyebrow">${esc(u.blur_note)}</span>` : ""}${k.link ? `<a class="btn" target="_blank" rel="noopener" href="${esc(k.link)}">${esc(u.g_verify)} ↗</a>` : ""}`;
-    d.classList.add("on"); $(".hd-close", d).onclick = () => { d.classList.remove("on"); $$(".holo-card").forEach(x => x.classList.remove("sel")); };
+    d.classList.add("on"); $(".hd-close", d).onclick = () => { d.innerHTML = `<p class="holo-empty">${esc(u.v3_pick)}</p>`; $$(".sat, .chip").forEach(x => x.classList.remove("on")); };
     $$(".hd-imgs img", d).forEach(im => im.onclick = () => { const lb = $("#lightbox"); if (lb) { $("img", lb).src = im.dataset.full; lb.classList.add("open"); lb.onclick = () => lb.classList.remove("open"); } });
   }
 
@@ -130,7 +167,13 @@
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
     if (auto && !drag && !reduced && focus === null) tRotY += .0008;
     rotY += (tRotY - rotY) * .07; rotX += (tRotX - rotX) * .07; zoom += (tZoom - zoom) * .08;
-    if (focus !== null) { const c0 = project({ x: 0, y: .1, z: 0 }, true); tOffX = W * .5 - c0.X; tOffY = H * .5 - c0.Y; }
+    if (focus !== null) { const c0 = project({ x: 0, y: .1, z: 0 }, true), af = anchors[focus], n0 = project({ x: af[0], y: af[1], z: af[2] }, true);
+      tOffX = W * .5 - c0.X; tOffY = H * .5 - c0.Y;
+      // brain stays centred, but the focused neuron is kept inside a band (left of the panel, mid-height) so its satellite ring has room
+      const narrow = W < 981, yN = Math.min(H * .26, H * .39 - 90);                  // narrow: panel sits at the bottom, neuron goes to the upper free area
+      const nx = n0.X + tOffX, ny = n0.Y + tOffY, xMin = narrow ? W * .5 : W * .32, xMax = narrow ? W * .5 : W * .44, yMin = narrow ? yN : H * .44, yMax = narrow ? yN : H * .56;
+      if (nx > xMax) tOffX -= nx - xMax; else if (nx < xMin) tOffX += xMin - nx;
+      if (ny < yMin) tOffY += yMin - ny; else if (ny > yMax) tOffY -= ny - yMax; }
     offX += (tOffX - offX) * .08; offY += (tOffY - offY) * .08;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .95 : 1, P = pts.map(p => project(p));
@@ -145,13 +188,13 @@
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
     // hologram links
-    if (focus !== null) { const a = A[focus]; const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + pr.height * .5); ctx.stroke(); ctx.setLineDash([]); }
+    if (focus !== null) { const a = A[focus]; placeSats(a, t); ctx.strokeStyle = "rgba(46,230,197,.35)"; ctx.lineWidth = 1; sats.forEach(el => { const x = parseFloat(el.style.left), y = parseFloat(el.style.top); if (isNaN(x)) return; ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(x, y); ctx.stroke(); }); const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + pr.height * .5); ctx.stroke(); ctx.setLineDash([]); }
       for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
     $$(".neuron").forEach((el, i) => { const a = A[i], depth = 1 - (a.z + 1) / 2; el.style.left = a.X + "px"; el.style.top = a.Y + "px";
       const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.7 : .5)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
       el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .1); el.style.zIndex = Math.round(depth * 10) + 2; el.classList.toggle('is-focus', i === focus); });
     requestAnimationFrame(frame);
   }
-  window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
+  window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); const g = $("#hlghost"); if (g) g.textContent = C().headlines.reduce((m, x) => x.length > m.length ? x : m, ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
   requestAnimationFrame(frame);
 })();
