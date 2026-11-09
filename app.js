@@ -104,7 +104,7 @@
     document.documentElement.lang = lang;
     $$("[data-ui]").forEach(el => { el.textContent = C().ui[el.dataset.ui] ?? ""; });
     $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
-    renderStory(); Graph.mount(C()); startHeadlines();
+    renderRoute(); renderStory(); layoutRoute(first); startHeadlines();
     $("#year").textContent = new Date().getFullYear();
     observe(); bindLightbox();
   }
@@ -113,6 +113,7 @@
     $("main").classList.add("switching"); setTimeout(() => { render(false); requestAnimationFrame(() => $("main").classList.remove("switching")); }, 200);
   }));
   
+  addEventListener("resize", () => layoutRoute(false));
   $$(".dir a, .ctas a[href^='#']").forEach(l => l.addEventListener("click", e => { e.preventDefault(); smooth(l.getAttribute("href")); }));
 
   /* reveal + scroll */
@@ -128,6 +129,7 @@
     const h = document.documentElement, max = h.scrollHeight - innerHeight;
     $("#progress").style.transform = `scaleX(${max ? h.scrollTop / max : 0})`;
     let cur = -1; $$(".stopsec").forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * .5) cur = i; });
+    $$(".stop").forEach((el, i) => el.classList.toggle("lit", i === cur));
     const sec = ["#facts", "#contact"].find(id => $(id).getBoundingClientRect().top < innerHeight * .5) || (cur >= 4 ? "#work" : cur >= 0 ? "#story" : "");
     links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === sec));
   }
