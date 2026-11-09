@@ -33,7 +33,7 @@
   const pts = [], edges = [];
   function rnd(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
   const R = rnd(42);
-  // Anatomy: two hemispheres (long front→back, z axis), a fissure between them, cerebellum at the back-bottom, brainstem below.
+  // Anatomy: two hemispheres (long front→back, z axis) with a fissure between them.
   const hemi = (side, n) => { for (let i = 0; i < n; i++) { const u = R() * 6.2832, v = Math.acos(2 * R() - 1);
       let x = Math.sin(v) * Math.cos(u), y = Math.cos(v), z = Math.sin(v) * Math.sin(u);
       // squash into hemisphere: flat inner face at the fissure, flatter base
