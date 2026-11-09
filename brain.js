@@ -301,6 +301,6 @@
   }
   let stemTo = 0; const sigS = t => reduced ? -9 : (t * 1.25) % 9.5;
   window.BrainInfo = () => { const r = wrap.getBoundingClientRect(); return { S: baseS * zoom, rect: r, cY, probe: drawProbe, cordPath, cordS, drawRoute, x: r.left + cX + offX, STEM, pts: stemPts, edges: stemEdges, point: stemPoint, proj: projStem, axisAt, draw: drawCloud, sigS, resting: focus === null && !wrap.classList.contains("focused") }; };
-  window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); const g = $("#hlghost"); if (g) g.textContent = C().headlines.reduce((m, x) => x.length > m.length ? x : m, ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
+  window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); const g = $("#hlghost"); if (g) g.textContent = C().headlines.reduce((m, x) => x.length > m.length ? x : m, ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced && C().headlines.length > 1) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
   requestAnimationFrame(frame);
 })();
