@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amir Maya — legacy</title><meta name="robots" content="noindex">
+<meta name="description" content="Amir Maya — seller growth and marketplace tooling. Amazon Turkey, Hype-Merch co-founder, TRNotify founder.">
+<meta property="og:title" content="Amir Maya"><meta property="og:description" content="Twelve years, seven stops."><meta property="og:url" content="https://amirmaya.com">
+<meta name="theme-color" content="#F1F1EE">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=202611091906">
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<header class="fascia" id="nav">
+  <div class="wrap fascia-in">
+    <a class="brand" href="#top"><span class="brand-mark"><img src="assets/img/portrait.png" alt=""></span><span class="brand-text"><b>Amir Maya</b><span class="mono sub"><span data-ui="role_short"></span> · <span id="clock">--:--</span></span></span></a>
+    <nav class="dir"><a href="#story" data-ui="story"></a><a href="#work" data-ui="work"></a><a href="#facts" data-ui="facts"></a><a href="#contact" data-ui="contact"></a></nav>
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Language"><button data-lang="en">EN</button><button data-lang="tr">TR</button></div>
+      <button class="theme" id="theme" aria-label="Toggle theme"><i></i></button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-in">
+      <div class="hero-top">
+        <p class="eyebrow" data-ui="eyebrow"></p>
+        <div class="hl-wrap"><h1 class="hl" id="hl"></h1><div class="hl-dots" id="hldots"></div></div>
+      </div>
+      <div class="route-head"><span class="eyebrow" data-ui="route_eyebrow"></span>
+        <div class="door" id="door"><span class="live"><i></i><span data-ui="door"></span></span>
+          <span class="dstat"><b class="mono" data-k="today">0000</b><span data-ui="door_today"></span></span>
+          <span class="dstat"><b class="mono" data-k="online">1</b><span data-ui="door_now"></span></span>
+          <span class="dstat"><b class="mono" data-k="avg">—</b><span data-ui="door_avg"></span></span>
+          <span class="eyebrow dim" data-ui="door_note"></span></div></div>
+      <div class="route" id="route">
+        <svg class="route-svg" id="routeSvg" viewBox="0 0 1400 420" preserveAspectRatio="none" aria-hidden="true">
+          <path id="routeGhost" d="" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 8" opacity=".25"/>
+          <path id="routePath" d="" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <div class="stops" id="stops"></div>
+        <div class="tip" id="tip"><span class="eyebrow" id="tipK"></span><span id="tipT"></span></div>
+      </div>
+      <div class="hero-body">
+        <div class="hero-left">
+          <p class="intro" data-me="tagline"></p>
+          <div class="ctas"><a class="btn btn-ink" href="#story" data-ui="cta_story"></a><a class="btn" href="assets/Amir_Maya_CV.pdf" target="_blank" rel="noopener"><span data-ui="cv"></span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M3 13h10"/></svg></a></div>
+        </div>
+        <aside class="duty">
+          <div class="duty-head"><span class="eyebrow" data-ui="duty"></span><span class="live"><i></i><span data-ui="live"></span></span></div>
+          <div class="duty-body">
+            <span class="photo"><img src="assets/img/portrait.png" alt="Amir Maya"></span>
+            <div><b class="duty-name" data-me="name"></b><p class="duty-role" data-me="title"></p><p class="duty-where mono" data-me="where"></p></div>
+          </div>
+          <dl class="duty-facts" id="dutyFacts"></dl>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="story">
+    <div class="wrap">
+      <div class="section-head"><div><p class="eyebrow" data-ui="s1_eyebrow"></p><h2 class="section-title" data-ui="s1_title"></h2></div><p class="section-intro" data-ui="s1_intro"></p></div>
+      <div id="storyList"></div>
+    </div>
+  </section>
+  <div id="work"></div>
+
+  <section class="section facts" id="facts">
+    <div class="wrap">
+      <div class="section-head"><div><p class="eyebrow" data-ui="s3_eyebrow"></p><h2 class="section-title" data-ui="s3_title"></h2></div></div>
+      <p class="eyebrow" data-ui="skills" style="margin:0 0 14px"></p>
+      <div class="skills" id="skills"></div>
+      <p class="eyebrow" data-ui="education" style="margin:0 0 14px"></p>
+      <div class="edu" id="edu"></div>
+      <div class="facts-grid">
+        <div class="fcol"><p class="eyebrow" data-ui="langs"></p><ul class="langbars" id="langbars"></ul></div>
+        <div class="fcol"><p class="eyebrow" data-ui="certs"></p><ul class="plain" id="certs"></ul></div>
+        <div class="fcol"><p class="eyebrow" data-ui="interests"></p><ul class="chips" id="interests"></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact">
+    <div class="wrap contact-in">
+      <div class="contact-left"><p class="eyebrow" data-ui="s4_eyebrow"></p><h2 class="contact-title" data-ui="contact_title"></h2><p class="section-intro" data-ui="contact_sub"></p>
+        <div class="ctas"><a class="btn btn-ink btn-lg" href="mailto:mayaamir96@gmail.com" data-ui="email"></a><a class="btn btn-lg" href="https://www.linkedin.com/in/amir-maya-a8460910b/" target="_blank" rel="noopener">LinkedIn</a><a class="btn btn-lg" href="assets/Amir_Maya_CV.pdf" target="_blank" rel="noopener" data-ui="cv"></a></div></div>
+      <div class="wall" id="wall"></div>
+    </div>
+  </section>
+  <footer class="site-footer"><div class="wrap"><span data-ui="footer"></span><span class="mono">© <span id="year"></span> amirmaya.com</span></div></footer>
+</main>
+
+<div class="lightbox" id="lightbox"><img alt=""><button aria-label="Close">×</button></div>
+<script src="content.js?v=202611091906"></script><script src="app.js?v=202611091906"></script><script src="counter.js?v=202611091906" defer></script>
+</body>
+</html>

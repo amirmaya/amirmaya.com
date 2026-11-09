@@ -40,7 +40,7 @@
       x = Math.abs(x) * .50 + .04; y = y * .64; z = z * .98; if (y < -.25) y = -.25 - (y + .25) * .45; if (z > .6) y -= (z - .6) * .35;   // frontal lobe slopes down
       const g = .035 * Math.sin(z * 9 + y * 7) * Math.cos(x * 11 + z * 5);                                             // gyri texture
       pts.push({ x: side * (x + g), y: y + .1 + g, z: z - .05 + g, s: .55 + R() * 1.0 }); } };
-  hemi(-1, 900); hemi(1, 900);
+  const DENSE = Math.min(innerWidth, innerHeight) >= 700 ? 900 : 520; hemi(-1, DENSE); hemi(1, DENSE);
   const N = pts.length;
   for (let i = 0; i < N; i++) { const d = []; const p = pts[i]; for (let j = 0; j < N; j++) if (j !== i) { const q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); } d.sort((a, b2) => a[0] - b2[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
   const anchors = [[-.62, .12, .55], [-.36, .66, .25], [.05, .5, .82], [.40, .68, .1], [.64, .22, .5]];
@@ -124,8 +124,9 @@
   }
 
   /* ---- render loop ---- */
-  let t0 = null;
+  let t0 = null, visible = true; new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting), { threshold: 0 }).observe(wrap); document.addEventListener('visibilitychange', () => { if (!document.hidden) requestAnimationFrame(frame); });
   function frame(now) {
+    if (document.hidden) return; if (!visible && focus === null) { requestAnimationFrame(frame); return; }
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
     if (auto && !drag && !reduced && focus === null) tRotY += .0008;
     rotY += (tRotY - rotY) * .07; rotX += (tRotX - rotX) * .07; zoom += (tZoom - zoom) * .08;
@@ -148,7 +149,7 @@
       for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
     $$(".neuron").forEach((el, i) => { const a = A[i], depth = 1 - (a.z + 1) / 2; el.style.left = a.X + "px"; el.style.top = a.Y + "px";
       const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.7 : .5)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
-      el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .1); el.style.zIndex = Math.round(depth * 10) + 2; });
+      el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .1); el.style.zIndex = Math.round(depth * 10) + 2; el.classList.toggle('is-focus', i === focus); });
     requestAnimationFrame(frame);
   }
   window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };

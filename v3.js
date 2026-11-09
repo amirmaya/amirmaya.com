@@ -122,6 +122,7 @@
     io && io.disconnect();
     io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("in")), { threshold: .1 });
     $$(".interns, .press, .awards, .apps, .smalls, .tools-grid, .stats").forEach(g => [...g.children].forEach((c, i) => { c.classList.add("reveal"); c.style.setProperty("--rd", (i * .07) + "s"); }));
+    $$(".section-head, .stopsec").forEach(el => { el.classList.add("reveal-watch"); io.observe(el); });
     $$(".reveal").forEach(el => io.observe(el));
   }
   const links = $$(".dir a");
@@ -143,5 +144,5 @@
   const tick = () => { $("#clock").textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
   tick(); setInterval(tick, 20000);
 
-  render(true); onScroll();
+  document.body.classList.add("booting"); render(true); onScroll(); setTimeout(() => document.body.classList.remove("booting"), 350);
 })();
