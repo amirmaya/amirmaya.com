@@ -53,6 +53,7 @@ async def main():
         for w, h in VIEWPORTS:
             for lang in ("en", "tr"):
                 pg = await b.new_page(viewport={"width": w, "height": h}); errs = []
+                await pg.route("**/amirmaya-stats.mayaamir96.workers.dev/**", lambda r: r.fulfill(status=200, headers={"access-control-allow-origin": "*", "content-type": "application/json"}, body='{"today":128,"online":3,"avg_visit":131}'))   # never spend the free KV write quota on audits
                 pg.on("pageerror", lambda e: errs.append("pageerror: " + str(e)[:160])); pg.on("console", lambda m: errs.append("console: " + m.text[:160]) if m.type == "error" else None)
                 await pg.add_init_script(f"localStorage.setItem('lang','{lang}')")
                 await pg.goto(URL, wait_until="load"); await pg.wait_for_timeout(2500)

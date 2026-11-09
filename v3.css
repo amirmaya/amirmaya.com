@@ -7,7 +7,7 @@ body{background:radial-gradient(1200px 700px at 72% 18%,#0e1526 0%,var(--paper) 
 .seg,.theme{border-width:1px}.dir a:hover,.dir a.active{border-color:var(--line)}
 /* hero = exactly one screen: fixed header height as top padding, two columns, brain stage fills the right column */
 .hero.v3{border-bottom:1px solid var(--line);height:100vh;min-height:560px;display:grid;grid-template-rows:minmax(0,1fr);padding:72px 0 12px;overflow:hidden}
-.hero-grid{display:grid;grid-template-columns:minmax(360px,42%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;gap:0;min-height:0;max-width:1500px;margin:0 auto;width:100%}
+.hero-grid{display:grid;grid-template-columns:minmax(360px,40%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch;gap:0;min-height:0;max-width:1500px;margin:0 auto;width:100%}
 .copy{display:flex;flex-direction:column;justify-content:center;gap:var(--gap);width:100%;max-width:520px;justify-self:center;padding:0 32px;min-height:0}
 .copy>*{flex:0 0 auto}
 h1{letter-spacing:-.03em;font-weight:800}
@@ -112,12 +112,12 @@ html{scrollbar-color:#263046 #07090f}
 .copy .eyebrow{margin:0}
 h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.08;min-height:0;max-height:none;overflow:visible;max-width:none}
 .hl-ghost{display:block;visibility:hidden}.hl-live{position:absolute;inset:0}
-.intro{font-size:clamp(13px,1.9vh,15px);line-height:1.55;max-width:none;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.intro{font-size:clamp(13px,1.9vh,15px);line-height:1.55;max-width:none}
 .ctas .btn{min-height:40px;padding:0 16px;font-size:13.5px}
 .duty{padding:12px 14px 12px;gap:10px;margin-top:0}.duty-head .eyebrow{font-size:10px}
 .duty-body{gap:12px}.photo{width:60px;height:60px}.duty-name{font-size:17px}.duty-role{font-size:13px;margin:1px 0 0}.duty-where{font-size:10px;margin:3px 0 0}
 .duty-facts{padding-top:9px;gap:5px}.duty-facts div{grid-template-columns:56px 1fr;font-size:12px;gap:10px}.duty-facts dt{font-size:9.5px}
-@media (max-height:720px){.duty-facts div:nth-child(n+4){display:none}.intro{-webkit-line-clamp:3}}
+@media (max-height:720px){.duty-facts div:nth-child(n+4){display:none}}
 /* satellites: children as small neurons orbiting the focused neuron */
 .sat{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;opacity:0;animation:satin .5s var(--e) both;animation-delay:var(--d,0ms);z-index:6}
 .sat .sd{width:40px;height:40px;border-radius:50%;overflow:hidden;border:1px solid rgba(46,230,197,.65);background:#0b0f19;box-shadow:0 0 18px -4px rgba(46,230,197,.6);transition:transform .25s var(--e),box-shadow .25s}

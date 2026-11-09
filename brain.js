@@ -40,19 +40,41 @@
   const hemi = (side, n) => { for (let i = 0; i < n; i++) { const u = R() * 6.2832, v = Math.acos(2 * R() - 1);
       let x = Math.sin(v) * Math.cos(u), y = Math.cos(v), z = Math.sin(v) * Math.sin(u);
       // squash into hemisphere: flat inner face at the fissure, flatter base
-      x = Math.abs(x) * .50 + .04; y = y * .64; z = z * .98; if (y < -.25) y = -.25 - (y + .25) * .45; if (z > .6) y -= (z - .6) * .35;   // frontal lobe slopes down
+      x = Math.abs(x) * .50 + .04; y = y * .64; z = z * .74; if (y < -.25) y = -.25 - (y + .25) * .45; if (z > .45) y -= (z - .45) * .45;   // frontal lobe slopes down; length:width ≈ 1.35 like a real brain
       const g = .035 * Math.sin(z * 9 + y * 7) * Math.cos(x * 11 + z * 5);                                             // gyri texture
       pts.push({ x: side * (x + g), y: y + .1 + g, z: z - .05 + g, s: .55 + R() * 1.0 }); } };
   const DENSE = Math.min(innerWidth, innerHeight) >= 700 ? 900 : 520; hemi(-1, DENSE); hemi(1, DENSE);
   const N = pts.length;
   for (let i = 0; i < N; i++) { const d = []; const p = pts[i]; for (let j = 0; j < N; j++) if (j !== i) { const q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); } d.sort((a, b2) => a[0] - b2[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
-  const anchors = [[-.62, .12, .55], [-.36, .66, .25], [.05, .5, .82], [.40, .68, .1], [.64, .22, .5]];
+  const anchors = [[-.62, .12, .42], [-.36, .66, .19], [.05, .5, .62], [.40, .68, .08], [.64, .22, .38]];
 
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
-  function size() { W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
+  const FOCAL = 3.2;
+  let baseS = 300, cX = 0, cY = 0;                       // scale unit (px per brain unit at zoom 1) and projection centre
+  /* Rest fit: the brain rotates continuously, so size it to the largest footprint over a full turn (points + neuron boxes),
+     then centre that footprint in the stage, leaving room for the HUD strip at the top and the legend at the bottom. */
+  function restFit(w, h) {
+    const PAD = { top: 44, bottom: 62, side: 10 }, NB = { x: 68, yTop: 38, yBot: 74 }; // stage margins (HUD / legend), neuron box around its anchor
+    let xa = 0, ya = 0, yaN = 0, xp = 0, yp = 0, ypN = 0;                             // unit extents (symmetric in x after the sweep)
+    const samp = pts.filter((_, i) => i % 7 === 0);
+    for (let ry = -.78; ry <= .1; ry += .08) for (const rx of [-.05, .12, .3]) {        // idle sway ±.22 + pointer ±.15 around -.35
+      const cy = Math.cos(ry), sy = Math.sin(ry), cx = Math.cos(rx), sx = Math.sin(rx);
+      const pr = p => { const x = p.x * cy + p.z * sy; let z = -p.x * sy + p.z * cy; const y = p.y * cx - z * sx; z = p.y * sx + z * cx; const f = FOCAL / (FOCAL + z); return [x * f, y * f]; };
+      for (const p of samp) { const [x, y] = pr(p); xp = Math.max(xp, Math.abs(x)); yp = Math.max(yp, y); ypN = Math.max(ypN, -y); }
+      for (const a of anchors) { const [x, y] = pr({ x: a[0], y: a[1], z: a[2] }); xa = Math.max(xa, Math.abs(x)); ya = Math.max(ya, y); yaN = Math.max(yaN, -y); }
+    }
+    // need(S) = extent*S + constant margin; solve the largest S whose footprint fits (monotone → bisection)
+    const top = S => Math.max(ya * S + NB.yTop, yp * S + 6), bot = S => Math.max(yaN * S + NB.yBot, ypN * S + 6), half = S => Math.max(xa * S + NB.x, xp * S + 6);
+    let lo = 40, hi = 2000; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; (top(m) + bot(m) <= h - PAD.top - PAD.bottom && 2 * half(m) <= w - 2 * PAD.side) ? lo = m : hi = m; }
+    const S = lo, free = (h - PAD.top - PAD.bottom) - (top(S) + bot(S));
+    return { S, cx: w / 2, cy: PAD.top + free / 2 + top(S) };
+  }
+  function fit() { if (wrap.classList.contains("focused")) { baseS = Math.min(W, H) * .44; cX = W / 2; cY = H / 2 - 10; } else { const f = restFit(W, H); baseS = f.S; cX = f.cx; cY = f.cy; } }
+  function size() { W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; fit(); }
   size(); addEventListener("resize", () => size());
-  wrap.addEventListener("pointermove", e => { if (focus !== null) return; if (drag) { tRotY = drag.ry + (e.clientX - drag.x) * .006; tRotX = Math.max(-.6, Math.min(.6, drag.rx + (e.clientY - drag.y) * .004)); } else if (!reduced) { const r = wrap.getBoundingClientRect(); tRotY = -.35 + ((e.clientX - r.left) / r.width - .5) * .5; tRotX = .12 + ((e.clientY - r.top) / r.height - .5) * .3; } });
+  wrap.addEventListener("pointermove", e => { if (focus !== null) return; if (drag) { tRotY = drag.ry + (e.clientX - drag.x) * .006; tRotX = Math.max(-.6, Math.min(.6, drag.rx + (e.clientY - drag.y) * .004)); } else if (!reduced) { const r = wrap.getBoundingClientRect(); tRotY = -.35 + ((e.clientX - r.left) / r.width - .5) * .3; tRotX = .12 + ((e.clientY - r.top) / r.height - .5) * .3; } });
+  let hover = false; wrap.addEventListener("pointerenter", () => hover = true); wrap.addEventListener("pointerleave", () => hover = false);
   wrap.addEventListener("pointerdown", e => { if (focus === null && e.target === cv) { drag = { x: e.clientX, y: e.clientY, ry: tRotY, rx: tRotX }; auto = false; } });
   addEventListener("pointerup", () => drag = null);
   cv.addEventListener("click", () => { if (focus !== null) unfocus(); });
@@ -60,8 +82,8 @@
   function project(p, raw) {
     const cy = Math.cos(rotY), sy = Math.sin(rotY), cx = Math.cos(rotX), sx = Math.sin(rotX);
     let x = p.x * cy + p.z * sy, z = -p.x * sy + p.z * cy, y = p.y * cx - z * sx; z = p.y * sx + z * cx;
-    const f = 2.6 / (2.6 + z), S = Math.min(W, H) * .44 * zoom;
-    return { X: W / 2 + x * f * S + (raw ? 0 : offX), Y: H / 2 - 10 - y * f * S + (raw ? 0 : offY), z, f };
+    const f = FOCAL / (FOCAL + z), S = baseS * zoom;
+    return { X: cX + x * f * S + (raw ? 0 : offX), Y: cY - y * f * S + (raw ? 0 : offY), z, f };
   }
 
   /* ---- neurons ---- */
@@ -80,15 +102,17 @@
   function expand() {
     const r = wrap.getBoundingClientRect(); placeholder = document.createElement("div"); placeholder.style.height = r.height + "px"; wrap.parentNode.insertBefore(placeholder, wrap);
     // go full-screen instantly, but start the camera where the brain was on screen so nothing jumps; the camera then eases to the centre
-    const oldW = W, oldH = H; wrap.classList.add("focused"); document.body.classList.add("brain-open"); size();
-    const k = Math.min(oldW, oldH) / Math.min(W, H);           // keep the same on-screen size at first
-    zoom = k; const c0 = project({ x: 0, y: .1, z: 0 }, true); offX = (r.left + oldW / 2) - c0.X; offY = (r.top + oldH / 2 + 0) - c0.Y;
+    const oldS = baseS, oldCx = cX, oldCy = cY; wrap.classList.add("focused"); document.body.classList.add("brain-open"); size();
+    zoom = oldS / baseS;                                        // keep the same on-screen size at first
+    const c0 = project({ x: 0, y: .1, z: 0 }, true); offX = (r.left + oldCx) - c0.X; offY = (r.top + oldCy) - c0.Y;
     requestAnimationFrame(() => wrap.classList.add("lit"));
   }
   function collapse() {
     if (!placeholder) return; const r = placeholder.getBoundingClientRect();
     // ease the camera back to where the inline brain will be, then drop the overlay
-    const k = Math.min(r.width, r.height) / Math.min(W, H); tZoom = k; const c0 = project({ x: 0, y: .1, z: 0 }, true); tOffX = (r.left + r.width / 2) - c0.X; tOffY = (r.top + r.height / 2) - c0.Y;
+    const rf = restFit(r.width, r.height); tZoom = rf.S / baseS;
+    const z0 = zoom; zoom = tZoom; const c0 = project({ x: 0, y: .1, z: 0 }, true); zoom = z0;   // measure at the target zoom
+    tOffX = (r.left + rf.cx) - c0.X; tOffY = (r.top + rf.cy) - c0.Y;
     wrap.classList.remove("lit");
     setTimeout(() => { wrap.classList.remove("focused"); document.body.classList.remove("brain-open"); placeholder.remove(); placeholder = null; size(); zoom = 1; offX = offY = 0; tZoom = 1; tOffX = tOffY = 0; }, 650);
   }
@@ -165,7 +189,7 @@
   function frame(now) {
     if (document.hidden) return; if (!visible && focus === null) { requestAnimationFrame(frame); return; }
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
-    if (auto && !drag && !reduced && focus === null) tRotY += .0008;
+    if (auto && !drag && !hover && !reduced && focus === null) tRotY = -.35 + Math.sin(t * .14) * .22;
     rotY += (tRotY - rotY) * .07; rotX += (tRotX - rotX) * .07; zoom += (tZoom - zoom) * .08;
     if (focus !== null) { const c0 = project({ x: 0, y: .1, z: 0 }, true), af = anchors[focus], n0 = project({ x: af[0], y: af[1], z: af[2] }, true);
       tOffX = W * .5 - c0.X; tOffY = H * .5 - c0.Y;
