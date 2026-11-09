@@ -76,16 +76,18 @@
   let placeholder = null;
   function expand() {
     const r = wrap.getBoundingClientRect(); placeholder = document.createElement("div"); placeholder.style.height = r.height + "px"; wrap.parentNode.insertBefore(placeholder, wrap);
-    wrap.classList.add("focused"); document.body.classList.add("brain-open");
-    const vw = innerWidth, vh = innerHeight, sx = r.width / vw, sy = r.height / vh;
-    wrap.style.transition = "none"; wrap.style.transform = `translate(${r.left}px,${r.top}px) scale(${sx},${sy})`; wrap.style.transformOrigin = "0 0";
-    requestAnimationFrame(() => { wrap.style.transition = "transform .7s cubic-bezier(.2,.7,.2,1)"; wrap.style.transform = "translate(0,0) scale(1,1)"; });
-    setTimeout(() => { size(); }, 50); setTimeout(() => { size(); placePanel(); }, 720);
+    // go full-screen instantly, but start the camera where the brain was on screen so nothing jumps; the camera then eases to the centre
+    const oldW = W, oldH = H; wrap.classList.add("focused"); document.body.classList.add("brain-open"); size();
+    const k = Math.min(oldW, oldH) / Math.min(W, H);           // keep the same on-screen size at first
+    zoom = k; const c0 = project({ x: 0, y: .1, z: 0 }, true); offX = (r.left + oldW / 2) - c0.X; offY = (r.top + oldH / 2 + 0) - c0.Y;
+    requestAnimationFrame(() => wrap.classList.add("lit"));
   }
   function collapse() {
-    if (!placeholder) return; const r = placeholder.getBoundingClientRect(); const sx = r.width / innerWidth, sy = r.height / innerHeight;
-    wrap.style.transition = "transform .6s cubic-bezier(.2,.7,.2,1)"; wrap.style.transform = `translate(${r.left}px,${r.top}px) scale(${sx},${sy})`;
-    setTimeout(() => { wrap.classList.remove("focused"); document.body.classList.remove("brain-open"); wrap.style.transform = ""; wrap.style.transition = ""; placeholder.remove(); placeholder = null; size(); }, 600);
+    if (!placeholder) return; const r = placeholder.getBoundingClientRect();
+    // ease the camera back to where the inline brain will be, then drop the overlay
+    const k = Math.min(r.width, r.height) / Math.min(W, H); tZoom = k; const c0 = project({ x: 0, y: .1, z: 0 }, true); tOffX = (r.left + r.width / 2) - c0.X; tOffY = (r.top + r.height / 2) - c0.Y;
+    wrap.classList.remove("lit");
+    setTimeout(() => { wrap.classList.remove("focused"); document.body.classList.remove("brain-open"); placeholder.remove(); placeholder = null; size(); zoom = 1; offX = offY = 0; tZoom = 1; tOffX = tOffY = 0; }, 650);
   }
   function focusOn(i) {
     if (focus === null) expand();
@@ -107,7 +109,7 @@
     $$(".hn", holo).forEach(btn => btn.onclick = () => focusOn(+btn.dataset.n));
     placePanel();
   }
-  function unfocus() { if (focus === null) return; focus = null; tZoom = 1; tOffX = tOffY = 0; tRotY = -.35; tRotX = .12; $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; collapse(); }
+  function unfocus() { if (focus === null) return; focus = null; tRotY = -.35; tRotX = .12; $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; collapse(); }
   function placePanel() { /* panel is CSS-positioned; nothing dynamic */ }
   const placeHolo = placePanel;
   function showDetail(k, btn) {
@@ -126,9 +128,9 @@
   function frame(now) {
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
     if (auto && !drag && !reduced && focus === null) tRotY += .0008;
-    rotY += (tRotY - rotY) * .06; rotX += (tRotX - rotX) * .06; zoom += (tZoom - zoom) * .07;
+    rotY += (tRotY - rotY) * .07; rotX += (tRotX - rotX) * .07; zoom += (tZoom - zoom) * .08;
     if (focus !== null) { const c0 = project({ x: 0, y: .1, z: 0 }, true); tOffX = W * .5 - c0.X; tOffY = H * .5 - c0.Y; }
-    offX += (tOffX - offX) * .07; offY += (tOffY - offY) * .07;
+    offX += (tOffX - offX) * .08; offY += (tOffY - offY) * .08;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .95 : 1, P = pts.map(p => project(p));
     for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.07 + (1 - (d + 1) / 2) * .34) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
