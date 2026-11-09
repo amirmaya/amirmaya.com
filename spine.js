@@ -26,11 +26,11 @@
     // the probe only wakes up near the column (the canvas sits under the text too)
     const nearCol = Math.abs(mx - B.x) < 150 && my > sr.top && my < lr.bottom, stim = nearCol ? { X: mx, Y: my, R: 95 } : null;
     B.draw(ctx, P, pts, B.edges, from, to, i => (pts[i].s < s0 - .25 ? 0 : 1) * (.25 + .75 * taper(pts[i].s)), i => Math.max(0, 1 - Math.abs(pts[i].s - sig) / .14) * taper(pts[i].s), stim, t);
-    // cord: the neural link, fading out with the column
-    ctx.save(); ctx.lineWidth = 1.6; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10;
-    const cs = Math.max(0, s0 - .2), ce = Math.min(sEnd, s1 + .2), a0 = B.axisAt(cs), q0 = toV(B.proj({ x: a0.x, y: B.STEM.top - cs, z: a0.z })), a1 = B.axisAt(ce), q1 = toV(B.proj({ x: a1.x, y: B.STEM.top - ce, z: a1.z }));
-    const g = ctx.createLinearGradient(0, q0.Y, 0, q1.Y); g.addColorStop(0, "rgba(46,230,197,.5)"); g.addColorStop(Math.max(0, Math.min(1, (ce - cs - 1.2) / (ce - cs))), "rgba(46,230,197,.5)"); g.addColorStop(1, "rgba(46,230,197,0)"); ctx.strokeStyle = g;
-    ctx.beginPath(); for (let ss = cs, first = true; ss <= ce; ss += .2) { const a = B.axisAt(ss), q = toV(B.proj({ x: a.x, y: B.STEM.top - ss, z: a.z })); first ? ctx.moveTo(q.X, q.Y) : ctx.lineTo(q.X, q.Y); first = false; } ctx.stroke(); ctx.restore();
+    // cord: a route through the column's own points (same as inside the hero), fading out with the column
+    { let c0 = 0; while (c0 < B.cordS.length && B.cordS[c0] < s0 - .3) c0++; let c1 = c0; while (c1 < B.cordS.length && B.cordS[c1] < Math.min(s1 + .3, sEnd)) c1++;
+      const vis = B.cordPath.slice(c0, c1), PP = {}; vis.forEach(i => { const p = pts[i]; PP[i] = toV(B.proj(B.point(p, .15 + .85 * taper(p.s)))); });
+      const sA = B.cordS[c0] ?? 0, sB = B.cordS[c1 - 1] ?? sA, kk = (!reduced && sig > sA && sig < sB) ? (sig - sA) / Math.max(1e-6, sB - sA) : -1;
+      B.drawRoute(ctx, PP, vis, .55, kk); }
     // nerve strands: from the column's surface at each chapter to the chapter panel
     for (const a of list.querySelectorAll(".stopsec")) {
       const d = a.querySelector(".biglogo").getBoundingClientRect(), m = a.querySelector(".main").getBoundingClientRect(), yc = d.top + d.height / 2; if (yc < -80 || yc > H + 80) continue;
@@ -40,10 +40,8 @@
       for (let i = 0; i <= n; i++) { const u = i / n, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2 + Math.sin(t * 1.3 + u * 6) * .8; pts2.push({ X, Y, z: Math.sin(u * 3.1416) * .4 - .2, f: 1 }); }
       for (let i = 1; i <= n; i++) { const p = pts2[i - 1], q = pts2[i], al = (.12 + .25 * (1 - i / n)) * base + f * .4; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .9; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
       pts2.forEach((q, i) => { const al = (.35 + .4 * (1 - i / n)) * base + f * .5, rr = (.7 + (1 - i / n) * .9) * (1 + f * .8); ctx.fillStyle = `rgba(124,156,255,${(al * .2).toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr * 3, 0, 6.283); ctx.fill(); ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr, 0, 6.283); ctx.fill(); });
-      if (f > 0) { const u = 1 - f, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2; ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18 * f; ctx.fillStyle = `rgba(220,255,247,${(.95 * f).toFixed(2)})`; ctx.beginPath(); ctx.arc(X, Y, 2.4, 0, 6.283); ctx.fill(); ctx.restore(); }
+      if (f > 0) { const u = 1 - f, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2; ctx.save(); ctx.shadowColor = "rgba(124,156,255,1)"; ctx.shadowBlur = 18 * f; ctx.fillStyle = `rgba(230,238,255,${(.95 * f).toFixed(2)})`; ctx.beginPath(); ctx.arc(X, Y, 2.4, 0, 6.283); ctx.fill(); ctx.restore(); }
     }
-    // the signal on the cord
-    if (!reduced && sig > s0 && sig < Math.min(s1, sEnd)) { const a = B.axisAt(sig), q = toV(B.proj({ x: a.x, y: B.STEM.top - sig, z: a.z })); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); }
   }
   requestAnimationFrame(frame);
 })();

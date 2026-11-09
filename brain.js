@@ -60,6 +60,42 @@
     stemPts.sort((a, b) => a.s - b.s); }
   const stemEdges = []; for (let i = 0; i < stemPts.length; i++) { const p = stemPts[i], d = []; for (let j = Math.max(0, i - 45); j < Math.min(stemPts.length, i + 45); j++) if (j !== i) { const q = stemPts[j]; d.push([(p.ax + p.dx - q.ax - q.dx) ** 2 + (p.s - q.s) ** 2 + (p.az + p.dz - q.az - q.dz) ** 2, j]); } d.sort((a, b) => a[0] - b[0]); for (let k = 0; k < 3; k++) if (d[k] && d[k][1] > i) stemEdges.push([i, d[k][1]]); }
   const stemPoint = (p, taper = 1) => ({ x: p.ax + p.dx * taper, y: STEM.top - p.s, z: p.az + p.dz * taper });
+  // ---- routes through the neural graph: shortest paths along existing edges (Dijkstra), bridging gaps when the graph is disconnected
+  function graphOf(n, E) { const adj = Array.from({ length: n }, () => []); for (const [i, j] of E) { adj[i].push(j); adj[j].push(i); } return adj; }
+  function dijkstra(adj, pos, src) { const n = adj.length, dist = new Float64Array(n).fill(Infinity), prev = new Int32Array(n).fill(-1), done = new Uint8Array(n); dist[src] = 0;
+    const heap = [[0, src]]; const push = x => { heap.push(x); let i = heap.length - 1; while (i) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { let l = 2 * i + 1, r = l + 1, m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+    while (heap.length) { const [d, u] = pop(); if (done[u]) continue; done[u] = 1; const pu = pos(u); for (const v of adj[u]) { if (done[v]) continue; const pv = pos(v), w = Math.hypot(pu.x - pv.x, pu.y - pv.y, pu.z - pv.z), nd = d + w; if (nd < dist[v]) { dist[v] = nd; prev[v] = u; push([nd, v]); } } }
+    return { dist, prev }; }
+  function route(adj, pos, a, b) {
+    // k-NN graphs come in islands: bridge the closest pair between what is reachable and what is not, until b is reachable
+    const A2 = adj.map(x => x.slice());
+    for (let guard = 0; guard < 40; guard++) {
+      const D = dijkstra(A2, pos, a); if (D.dist[b] < Infinity) { const out = []; for (let v = b; v !== -1; v = D.prev[v]) out.push(v); return out.reverse(); }
+      let best = Infinity, bi = -1, bj = -1;
+      for (let i = 0; i < A2.length; i++) { if (D.dist[i] === Infinity) continue; const pi = pos(i); for (let j = 0; j < A2.length; j++) { if (D.dist[j] < Infinity) continue; const pj = pos(j), d = (pi.x - pj.x) ** 2 + (pi.y - pj.y) ** 2 + (pi.z - pj.z) ** 2; if (d < best) { best = d; bi = i; bj = j; } } }
+      if (bi < 0) break; A2[bi].push(bj); A2[bj].push(bi);
+    }
+    return [a, b]; }
+  const nearest = (pos, n, q) => { let bi = 0, bd = Infinity; for (let i = 0; i < n; i++) { const p = pos(i), d = (p.x - q[0]) ** 2 + (p.y - q[1]) ** 2 + (p.z - q[2]) ** 2; if (d < bd) { bd = d; bi = i; } } return bi; };
+  // neuron-to-neuron links: one route per consecutive pair, concatenated into a single ordered path for the travelling signal
+  const brainAdj = graphOf(pts.length, edges), bpos = i => pts[i];
+  const anchorPts = anchors.map(a => nearest(bpos, pts.length, a));
+  const linkPath = []; for (let i = 1; i < anchorPts.length; i++) { const r = route(brainAdj, bpos, anchorPts[i - 1], anchorPts[i]); linkPath.push(...(i === 1 ? r : r.slice(1))); }
+  // the cord inside the column: a route from the top of the stem to its end
+  // the cord: in each thin slice of the column take the point closest to the axis; the chain of those points is the cord
+  const cordPath = []; { const STEP = .1; let k = 0, best = -1, bd = Infinity; for (let i = 0; i < stemPts.length; i++) { const p = stemPts[i]; while (p.s >= (k + 1) * STEP) { if (best >= 0) cordPath.push(best); k++; best = -1; bd = Infinity; } const d = p.dx * p.dx + p.dz * p.dz; if (d < bd) { bd = d; best = i; } } if (best >= 0) cordPath.push(best); }
+  const cordS = cordPath.map(i => stemPts[i].s);
+  const LINK = "124,156,255";
+  // draw a route as brighter edges + a glow dot travelling along it (k in 0..1)
+  function drawRoute(ctx, P, path, alpha, k, lw = 1.3) {
+    ctx.lineWidth = lw; ctx.strokeStyle = `rgba(${LINK},${alpha})`; ctx.beginPath(); let first = true, L = 0; const segs = [];
+    for (let i = 0; i < path.length; i++) { const q = P[path[i]]; if (!q) { first = true; continue; } if (first) { ctx.moveTo(q.X, q.Y); first = false; } else { const pr = P[path[i - 1]]; const d = Math.hypot(q.X - pr.X, q.Y - pr.Y); segs.push([pr, q, L, L + d]); L += d; ctx.lineTo(q.X, q.Y); } }
+    ctx.stroke();
+    for (const i of path) { const q = P[i]; if (!q) continue; ctx.fillStyle = `rgba(214,226,255,${Math.min(1, alpha + .25)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, 1.3 * q.f, 0, 6.283); ctx.fill(); }
+    if (k >= 0 && segs.length) { const target = k * L; const sgm = segs.find(sg => target <= sg[3]) || segs[segs.length - 1]; const u = (target - sgm[2]) / Math.max(1e-6, sgm[3] - sgm[2]), X = sgm[0].X + (sgm[1].X - sgm[0].X) * u, Y = sgm[0].Y + (sgm[1].Y - sgm[0].Y) * u;
+      ctx.save(); ctx.shadowColor = `rgba(${LINK},1)`; ctx.shadowBlur = 16; ctx.fillStyle = "rgba(230,238,255,.95)"; ctx.beginPath(); ctx.arc(X, Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); }
+  }
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
   const FOCAL = 3.2;
@@ -100,7 +136,7 @@
     for (const [a, b] of edges) { if (a < from || a >= to || b < from || b >= to) continue; const p = P[a - from], q = P[b - from]; if (!p || !q) continue; const d = (p.z + q.z) / 2, k = st((p.X + q.X) / 2, (p.Y + q.Y) / 2), al = (.07 + (1 - (d + 1) / 2) * .34) * alpha(a) + k * .5;
       ctx.strokeStyle = k > 0 ? `rgba(${Math.round(124 + 131 * k)},${Math.round(156 - 90 * k)},${Math.round(255 - 175 * k)},${al.toFixed(3)})` : `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8 + k * .6; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
     for (let i = from; i < to; i++) { const p = P[i - from]; if (!p) continue; const depth = 1 - (p.z + 1) / 2, fire = fireAt ? fireAt(i) : 0, k = st(p.X, p.Y), al = Math.min(1, (.3 + depth * .65) * alpha(i) + fire * .6 + k * .5), r = pts[i].sz * p.f * (1 + fire * .8 + k * 1.1);
-      ctx.fillStyle = k > 0 ? `rgba(255,70,60,${(al * .35 * k + .04).toFixed(3)})` : fire > 0 ? `rgba(46,230,197,${(al * .3).toFixed(3)})` : `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = k > 0 ? `rgba(255,70,60,${(al * .35 * k + .04).toFixed(3)})` : fire > 0 ? `rgba(124,156,255,${(al * .4).toFixed(3)})` : `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
       ctx.fillStyle = k > 0 ? `rgba(${Math.round(214 + 41 * k)},${Math.round(226 - 140 * k)},${Math.round(255 - 170 * k)},${al.toFixed(3)})` : `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
   }
   // the probe itself: a hot red core with a soft halo, drawn where the pointer is
@@ -236,30 +272,26 @@
     const stim = (hover && focus === null && px > -1e3) ? { X: px, Y: py, R: 95 } : null;
     drawCloud(ctx, P, pts.map(q => ({ sz: q.s * Math.sqrt(zoom) })), edges, 0, N, () => dim, null, stim, t);
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
-    ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
-    for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
+    // neurons are wired to each other through the brain's own edges (shortest routes along the point graph), the signal runs along the route
+    drawRoute(ctx, P, linkPath, focus === null ? .6 : .3, (!reduced && focus === null) ? (((t * .12) % 1) + 1) % 1 : -1);
     if (focus === null && innerWidth > 980) {                          // brain stem: the column leaves the stage through its base, the story canvas continues it
       const sMax = Math.max(0, (H + 30 - cY) / (baseS * zoom) + STEM.top) + .3; let to = 0; while (to < stemPts.length && stemPts[to].s < sMax) to++; stemTo = to;
       const P = []; for (let i = 0; i < to; i++) P.push(projStem(stemPoint(stemPts[i])));
       const sig = sigS(t);
       drawCloud(ctx, P, stemPts, stemEdges, 0, to, () => 1, i => Math.max(0, 1 - Math.abs(stemPts[i].s - sig) / .14), stim, t);
-      // the neural link continues down the column as its cord
-      ctx.save(); ctx.lineWidth = 1.6; ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath();
-      for (let ss = 0, first = true; ss <= sMax; ss += .2) { const a = axisAt(ss), q = projStem({ x: a.x, y: STEM.top - ss, z: a.z }); first ? ctx.moveTo(q.X, q.Y) : ctx.lineTo(q.X, q.Y); first = false; } ctx.stroke(); ctx.restore();
-      if (!reduced && sig < sMax) { const a = axisAt(sig), q = projStem({ x: a.x, y: STEM.top - sig, z: a.z }); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); } }
-    if (!reduced && focus === null) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
-      const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
-      ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
-    // hologram links
-    if (focus !== null) { const a = A[focus]; placeSats(a, t); ctx.strokeStyle = "rgba(46,230,197,.35)"; ctx.lineWidth = 1; sats.forEach(el => { const x = parseFloat(el.style.left), y = parseFloat(el.style.top); if (isNaN(x)) return; ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(x, y); ctx.stroke(); }); const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + pr.height * .5); ctx.stroke(); ctx.setLineDash([]); }
-      for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
+      // the cord: a route through the column's own points; the signal rides it
+      let ce = 0; while (ce < cordPath.length && cordS[ce] < sMax) ce++;
+      const vis = cordPath.slice(0, ce), kk = (!reduced && sig < sMax && cordS[ce - 1] > 0) ? Math.max(0, Math.min(1, sig / cordS[ce - 1])) : -1;
+      drawRoute(ctx, P, vis, .6, kk); }
+    if (focus !== null) { const a = A[focus]; placeSats(a, t); ctx.strokeStyle = `rgba(${LINK},.4)`; ctx.lineWidth = 1; sats.forEach(el => { const x = parseFloat(el.style.left), y = parseFloat(el.style.top); if (isNaN(x)) return; ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(x, y); ctx.stroke(); }); const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = `rgba(${LINK},.55)`; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + pr.height * .5); ctx.stroke(); ctx.setLineDash([]); }
+      for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(${LINK},${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
     $$(".neuron").forEach((el, i) => { const a = A[i], depth = 1 - (a.z + 1) / 2; el.style.left = a.X + "px"; el.style.top = a.Y + "px";
       const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.7 : .5)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
       el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .1); el.style.zIndex = Math.round(depth * 10) + 2; el.classList.toggle('is-focus', i === focus); });
     requestAnimationFrame(frame);
   }
   let stemTo = 0; const sigS = t => reduced ? -9 : (t * 1.25) % 9.5;
-  window.BrainInfo = () => { const r = wrap.getBoundingClientRect(); return { S: baseS * zoom, rect: r, cY, probe: drawProbe, x: r.left + cX + offX, STEM, pts: stemPts, edges: stemEdges, point: stemPoint, proj: projStem, axisAt, draw: drawCloud, sigS, resting: focus === null && !wrap.classList.contains("focused") }; };
+  window.BrainInfo = () => { const r = wrap.getBoundingClientRect(); return { S: baseS * zoom, rect: r, cY, probe: drawProbe, cordPath, cordS, drawRoute, x: r.left + cX + offX, STEM, pts: stemPts, edges: stemEdges, point: stemPoint, proj: projStem, axisAt, draw: drawCloud, sigS, resting: focus === null && !wrap.classList.contains("focused") }; };
   window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); const g = $("#hlghost"); if (g) g.textContent = C().headlines.reduce((m, x) => x.length > m.length ? x : m, ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
   requestAnimationFrame(frame);
 })();
