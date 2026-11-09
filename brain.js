@@ -49,10 +49,11 @@
   const anchors = [[-.62, .12, .42], [-.36, .66, .19], [.05, .5, .62], [.40, .68, .08], [.64, .22, .38]];
   // Brain stem: a column of vertebra rings on the brain's axis, from the base down past the stage edge. It rotates with the
   // brain, and the story spine below picks up its pitch and radius so the two read as one structure.
-  const STEM = { r: .046, pitch: .085, n: 8, top: -.16, len: 2.2 };
-  const stemRings = []; for (let k = 0; k * STEM.pitch < STEM.len; k++) { const y = STEM.top - k * STEM.pitch, w = k === 0 ? .6 : (k % 2 ? 1 : .72); // alternate vertebra / disc
-    const ring = []; for (let i = 0; i < STEM.n; i++) { const a = i / STEM.n * 6.2832; ring.push({ x: Math.cos(a) * STEM.r * w, y, z: Math.sin(a) * STEM.r * w }); } stemRings.push(ring); }
-
+  const STEM = { r: .048, pitch: .11, n: 10, top: -.16, len: 2.4 };
+  // each vertebra = body (two rings .42·pitch apart, a short cylinder) + a thinner disc ring below it
+  const stemRings = []; for (let k = 0; k * STEM.pitch < STEM.len; k++) { const y0 = STEM.top - k * STEM.pitch, w = k === 0 ? .8 : 1;
+    for (const [dy, ww, kind] of [[0, w, "body"], [.42, w, "body"], [.72, .6, "disc"]]) { const y = y0 - dy * STEM.pitch, ring = [];
+      for (let i = 0; i < STEM.n; i++) { const a = i / STEM.n * 6.2832; ring.push({ x: Math.cos(a) * STEM.r * ww, y, z: Math.sin(a) * STEM.r * ww }); } stemRings.push({ y, kind, k, ring }); } }
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
   const FOCAL = 3.2;
@@ -214,18 +215,25 @@
     ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
     for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
     if (focus === null && innerWidth > 980) {                          // brain stem leaves the stage through its base; the story spine continues it
-      stemPage = []; let prev = null;
-      for (let k = 0; k < stemRings.length; k++) { const P = stemRings[k].map(q => project(q)); const c = project({ x: 0, y: stemRings[k][0].y, z: 0 });
-        if (c.Y > H + 40) break; stemPage.push(c.Y);
-        const fade = Math.min(1, Math.max(.15, 1 - (c.Y - H * .78) / (H * .3)));            // fades slightly towards the edge, the spine takes over
-        ctx.lineWidth = 1; ctx.beginPath(); P.forEach((q, i) => i ? ctx.lineTo(q.X, q.Y) : ctx.moveTo(q.X, q.Y)); ctx.closePath(); ctx.strokeStyle = `rgba(46,230,197,${.22 * fade})`; ctx.stroke();
-        if (prev) { ctx.beginPath(); for (let i = 0; i < P.length; i += 2) { ctx.moveTo(prev[i].X, prev[i].Y); ctx.lineTo(P[i].X, P[i].Y); } ctx.strokeStyle = `rgba(46,230,197,${.14 * fade})`; ctx.stroke(); }
-        P.forEach(q => { const depth = 1 - (q.z + 1) / 2; ctx.fillStyle = `rgba(46,230,197,${(.35 + depth * .5) * fade})`; ctx.beginPath(); ctx.arc(q.X, q.Y, (1.1 + depth * .9) * Math.sqrt(baseS / 300), 0, 6.283); ctx.fill(); });
-        prev = P; }
-      // the cord inside the column, with the brain's travelling signal continuing down it
-      const c0 = project({ x: 0, y: STEM.top, z: 0 }), c1 = project({ x: 0, y: STEM.top - STEM.len, z: 0 });
-      ctx.save(); ctx.strokeStyle = "rgba(46,230,197,.55)"; ctx.lineWidth = 1.5; ctx.shadowColor = "rgba(46,230,197,.9)"; ctx.shadowBlur = 12; ctx.beginPath(); ctx.moveTo(c0.X, c0.Y); ctx.lineTo(c1.X, c1.Y); ctx.stroke(); ctx.restore();
-      if (!reduced) { const k = ((t * .22) % 1), sy = c0.Y + (Math.min(H + 20, c1.Y) - c0.Y) * k; ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 16; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(c0.X, sy, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); } }
+      stemPage = []; let prev = null; const sz = Math.sqrt(baseS / 300);
+      const c0 = project({ x: 0, y: STEM.top, z: 0 }), c1 = project({ x: 0, y: STEM.top - STEM.len, z: 0 }), yEdge = Math.min(H + 20, c1.Y);
+      const sig = reduced ? -1 : c0.Y + (yEdge - c0.Y) * ((t * .2) % 1);
+      // halo along the column
+      const hg = ctx.createLinearGradient(c0.X - STEM.r * baseS * 3.2, 0, c0.X + STEM.r * baseS * 3.2, 0); hg.addColorStop(0, "rgba(46,230,197,0)"); hg.addColorStop(.5, "rgba(46,230,197,.07)"); hg.addColorStop(1, "rgba(46,230,197,0)");
+      ctx.fillStyle = hg; ctx.fillRect(c0.X - STEM.r * baseS * 3.2, c0.Y, STEM.r * baseS * 6.4, Math.max(0, yEdge - c0.Y));
+      for (const R0 of stemRings) { const c = project({ x: 0, y: R0.y, z: 0 }); if (c.Y > H + 40) break; if (R0.kind === "body" && !stemPage.includes(R0.k)) stemPage.push(R0.k);
+        const P = R0.ring.map(q => project(q)), fade = Math.min(1, Math.max(.2, 1 - (c.Y - H * .8) / (H * .3))), fire = Math.max(0, 1 - Math.abs(sig - c.Y) / 70);
+        const al = (R0.kind === "body" ? .24 : .16) * fade + fire * .5;
+        ctx.lineWidth = 1; ctx.beginPath(); P.forEach((q, i) => i ? ctx.lineTo(q.X, q.Y) : ctx.moveTo(q.X, q.Y)); ctx.closePath(); ctx.strokeStyle = `rgba(46,230,197,${al})`; ctx.stroke();
+        if (prev) { const full = R0.kind === "body" && prev.kind === "body" && prev.k === R0.k; ctx.beginPath(); for (let i = 0; i < P.length; i += full ? 1 : 2) { ctx.moveTo(prev.P[i].X, prev.P[i].Y); ctx.lineTo(P[i].X, P[i].Y); } ctx.strokeStyle = `rgba(46,230,197,${(full ? .2 : .1) * fade + fire * .3})`; ctx.stroke(); }
+        P.forEach(q => { const depth = 1 - (q.z + 1) / 2; ctx.fillStyle = `rgba(46,230,197,${Math.min(1, (.3 + depth * .55) * fade + fire * .4)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, (1 + depth) * sz * (R0.kind === "body" ? 1 : .8), 0, 6.283); ctx.fill(); });
+        if (R0.kind === "body" && prev && prev.k === R0.k) { const L = project({ x: -STEM.r * 1.9, y: R0.y + .21 * STEM.pitch, z: 0 }), Rr = project({ x: STEM.r * 1.9, y: R0.y + .21 * STEM.pitch, z: 0 }), Lm = project({ x: -STEM.r, y: R0.y + .21 * STEM.pitch, z: 0 }), Rm = project({ x: STEM.r, y: R0.y + .21 * STEM.pitch, z: 0 });
+          ctx.beginPath(); ctx.moveTo(Lm.X, Lm.Y); ctx.lineTo(L.X, L.Y); ctx.moveTo(Rm.X, Rm.Y); ctx.lineTo(Rr.X, Rr.Y); ctx.strokeStyle = `rgba(46,230,197,${.2 * fade + fire * .3})`; ctx.stroke();
+          for (const e of [L, Rr]) { ctx.fillStyle = `rgba(46,230,197,${.6 * fade})`; ctx.beginPath(); ctx.arc(e.X, e.Y, 1.3 * sz, 0, 6.283); ctx.fill(); } }
+        prev = { P, kind: R0.kind, k: R0.k }; }
+      stemPage = stemPage.map(k => project({ x: 0, y: STEM.top - k * STEM.pitch, z: 0 }).Y);
+      ctx.save(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.5; ctx.shadowColor = "rgba(46,230,197,.9)"; ctx.shadowBlur = 12; ctx.beginPath(); ctx.moveTo(c0.X, c0.Y); ctx.lineTo(c1.X, c1.Y); ctx.stroke(); ctx.restore();
+      if (sig > 0) { ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(c0.X, sig, 2.6, 0, 6.283); ctx.fill(); const tr = ctx.createLinearGradient(0, sig - 80, 0, sig); tr.addColorStop(0, "rgba(46,230,197,0)"); tr.addColorStop(1, "rgba(46,230,197,.8)"); ctx.strokeStyle = tr; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(c0.X, Math.max(c0.Y, sig - 80)); ctx.lineTo(c0.X, sig); ctx.stroke(); ctx.restore(); } }
     if (!reduced && focus === null) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
