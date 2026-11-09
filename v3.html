@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Amir Maya — v3</title>
+<meta name="robots" content="noindex"><link rel="icon" href="assets/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07090f;--bg2:#0b0f19;--ink:#eef2ff;--ink2:#aab4cc;--muted:#6b7a99;--line:#1c2436;--acc:#2ee6c5;--acc2:#7c9cff;--sans:Archivo,system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:radial-gradient(1200px 700px at 70% 40%,#0e1526 0%,var(--bg) 60%);color:var(--ink2);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
+a{color:inherit;text-decoration:none}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+.nav{position:fixed;inset:0 0 auto 0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 40px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--ink);font-weight:700}.brand img{width:36px;height:36px;border-radius:50%;border:1px solid var(--line)}
+.brand .eyebrow{display:block;font-weight:400}
+.nav .right{display:flex;gap:8px;align-items:center}
+.seg{display:flex;border:1px solid var(--line)}.seg button{border:0;background:transparent;font:600 11px var(--mono);letter-spacing:.1em;color:var(--muted);padding:8px 12px;cursor:pointer}.seg button+button{border-left:1px solid var(--line)}.seg button.on{background:var(--ink);color:#07090f}
+.hero{height:100vh;display:grid;grid-template-columns:minmax(380px,44%) 1fr;align-items:center;gap:24px;padding:80px 40px 56px}
+.copy{display:flex;flex-direction:column;gap:18px;max-width:560px}
+h1{margin:0;color:var(--ink);font-size:clamp(26px,3vw,44px);line-height:1.05;letter-spacing:-.03em;font-weight:800;min-height:2.1em;max-width:22ch}
+h1 .caret{display:inline-block;width:.07em;height:.85em;background:var(--acc);margin-left:.08em;vertical-align:-.08em;animation:caret 1s steps(1) infinite}@keyframes caret{50%{opacity:0}}
+.intro{margin:0;font-size:16px;line-height:1.6;color:var(--ink2);max-width:52ch}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid var(--line);color:var(--ink);font-weight:600;font-size:14px;transition:border-color .2s,background .2s,transform .2s}
+.btn:hover{border-color:var(--acc);transform:translateY(-1px)}.btn.ink{background:var(--ink);color:#07090f;border-color:var(--ink)}.btn.ink:hover{background:var(--acc);border-color:var(--acc)}
+.door{display:inline-flex;align-items:stretch;border:1px solid var(--line);background:rgba(11,15,25,.7);backdrop-filter:blur(6px)}
+.door>*{padding:8px 14px;border-right:1px solid var(--line);display:flex;flex-direction:column;justify-content:center}.door>*:last-child{border-right:0}
+.door .live{flex-direction:row;gap:8px;align-items:center;color:var(--acc)}.door .live i{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc)}
+.dstat b{font-family:var(--mono);font-size:18px;font-weight:500;color:var(--ink);line-height:1.1}.dstat span{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.brain{position:relative;height:min(78vh,760px);min-height:380px}
+canvas{position:absolute;inset:0;width:100%;height:100%}
+.neuron{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:auto;will-change:transform,opacity}
+.neuron .disc{width:64px;height:64px;border-radius:50%;overflow:hidden;border:1.5px solid rgba(46,230,197,.7);box-shadow:0 0 0 4px rgba(46,230,197,.08),0 0 28px rgba(46,230,197,.35);background:#0b0f19;transition:transform .3s,box-shadow .3s;cursor:pointer}
+.neuron .disc img{width:100%;height:100%;object-fit:cover;display:block}
+.neuron:hover .disc{transform:scale(1.08);box-shadow:0 0 0 6px rgba(46,230,197,.14),0 0 40px rgba(46,230,197,.55)}
+.neuron .lbl{text-align:center;line-height:1.25;white-space:nowrap}.neuron .lbl b{display:block;color:var(--ink);font-size:12px;font-weight:700}.neuron .lbl span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--muted)}
+.tip{position:absolute;z-index:4;pointer-events:none;background:#0b0f19;border:1px solid var(--line);color:var(--ink2);padding:12px 14px;width:300px;font-size:13px;line-height:1.5;opacity:0;transform:translate(-50%,-100%) translateY(-10px);transition:opacity .2s,transform .25s;box-shadow:0 20px 50px -20px #000}
+.tip .eyebrow{display:block;margin-bottom:4px;color:var(--acc)}.tip.show{opacity:1;transform:translate(-50%,-100%) translateY(-16px)}
+.legend{position:absolute;left:0;bottom:-6px;display:flex;gap:18px}.legend .eyebrow{display:flex;align-items:center;gap:8px}.legend i{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 8px var(--acc)}.legend i.b{background:var(--acc2);box-shadow:0 0 8px var(--acc2)}
+.foot{position:fixed;left:40px;right:40px;bottom:16px;display:flex;justify-content:space-between;z-index:5}
+@media (max-width:980px){body{overflow:auto}.hero{grid-template-columns:1fr;height:auto;min-height:100vh;padding:84px 20px 40px;gap:10px}.brain{height:60vh;min-height:360px;order:-1}.neuron .disc{width:48px;height:48px}.foot,.nav .right .eyebrow{display:none}.nav{padding:14px 20px}}
+@media (prefers-reduced-motion:reduce){h1 .caret{animation:none}}
+</style></head>
+<body>
+<header class="nav"><a class="brand" href="index.html"><img src="assets/img/portrait.png" alt="">Amir Maya<span class="eyebrow" data-ui="role_short"></span></a>
+  <div class="right"><span class="eyebrow mono" id="clock"></span><div class="seg"><button data-lang="en">EN</button><button data-lang="tr">TR</button></div></div></header>
+<main class="hero">
+  <section class="copy">
+    <p class="eyebrow" data-ui="eyebrow"></p>
+    <h1><span id="hl"></span><span class="caret"></span></h1>
+    <p class="intro" data-me="tagline"></p>
+    <div class="ctas"><a class="btn ink" href="index.html#story" data-ui="cta_story"></a><a class="btn" href="assets/Amir_Maya_CV.pdf" target="_blank" rel="noopener" data-ui="cv"></a></div>
+    <div class="door" id="door"><span class="live"><i></i><span class="eyebrow" style="color:var(--acc)" data-ui="door"></span></span>
+      <span class="dstat"><b data-k="today">0000</b><span data-ui="door_today"></span></span><span class="dstat"><b data-k="online">1</b><span data-ui="door_now"></span></span><span class="dstat"><b data-k="avg">—</b><span data-ui="door_avg"></span></span></div>
+  </section>
+  <section class="brain" id="brain"><canvas id="cv"></canvas><div id="neurons"></div><div class="tip" id="tip"><span class="eyebrow" id="tipK"></span><span id="tipT"></span></div>
+    <div class="legend"><span class="eyebrow"><i></i><span data-ui="g_l1"></span></span><span class="eyebrow"><i class="b"></i><span data-ui="v3_signal"></span></span></div></section>
+</main>
+<footer class="foot"><span class="eyebrow" data-ui="v3_hint"></span><span class="eyebrow">amirmaya.com · v3 preview</span></footer>
+<script src="content.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let lang = localStorage.getItem("lang") || ((navigator.language || "en").toLowerCase().startsWith("tr") ? "tr" : "en");
+  const C = () => CONTENT[lang];
+  const UI_EXTRA = { en: { v3_signal: "Signal", v3_hint: "Drag or move the mouse to turn the brain. Click a neuron to open its chapter." }, tr: { v3_signal: "Sinyal", v3_hint: "Beyni döndürmek için fareyi hareket ettir. Bir nörona tıkla, bölümü açılır." } };
+
+  /* ---- text ---- */
+  let hlIdx = 0, hlTimer, tw;
+  function typeLine() { const lines = C().headlines, h = $("#hl"), txt = lines[hlIdx % lines.length]; let i = 0; clearInterval(tw); h.textContent = "";
+    tw = setInterval(() => { h.textContent = txt.slice(0, ++i); if (i >= txt.length) clearInterval(tw); }, reduced ? 0 : 24); }
+  function render() {
+    document.documentElement.lang = lang; const ui = { ...C().ui, ...UI_EXTRA[lang] };
+    $$("[data-ui]").forEach(el => el.textContent = ui[el.dataset.ui] ?? ""); $$("[data-me]").forEach(el => el.textContent = C().me[el.dataset.me]);
+    $$(".seg button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
+    clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600);
+    buildNeurons();
+  }
+  $$(".seg button").forEach(b => b.onclick = () => { lang = b.dataset.lang; localStorage.setItem("lang", lang); render(); });
+  const tick = () => $("#clock").textContent = "Istanbul " + new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()); tick(); setInterval(tick, 20000);
+
+  /* ---- brain point cloud ---- */
+  const cv = $("#cv"), ctx = cv.getContext("2d"), wrap = $("#brain"); let W, H, dpr = Math.min(2, devicePixelRatio || 1);
+  const N = 520, pts = [], edges = [];
+  // brain-ish surface: two hemispheres (ellipsoids offset on x) with a longitudinal fissure, flattened base, noise
+  function rnd(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+  const R = rnd(42);
+  for (let i = 0; i < N; i++) {
+    const u = R() * Math.PI * 2, v = Math.acos(2 * R() - 1), side = R() < .5 ? -1 : 1;
+    let x = Math.sin(v) * Math.cos(u) * .62, y = Math.cos(v) * .78, z = Math.sin(v) * Math.sin(u) * .95;
+    x = x * (1 - Math.abs(y) * .15) + side * .3;                         // hemispheres
+    if (y < -.35) y = -.35 - (y + .35) * .35;                             // flatten the base
+    if (z < -.55 && y < 0) y -= .18;                                      // cerebellum/stem bulge
+    const n = (R() - .5) * .06; x += n; y += n; z += n;
+    pts.push({ x, y, z, s: .6 + R() * 1.1 });
+  }
+  for (let i = 0; i < N; i++) { const d = []; for (let j = 0; j < N; j++) if (j !== i) { const p = pts[i], q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); }
+    d.sort((a, b) => a[0] - b[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
+  // 5 neurons anchored on the surface, left→right along a gentle arc
+  const anchors = [[-.72, .05, .45], [-.38, .62, .2], [.02, .34, .78], [.42, .66, .15], [.76, .1, .4]];
+  let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, drag = null, auto = true;
+  function size() { W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
+  size(); addEventListener("resize", () => { size(); });
+  wrap.addEventListener("pointermove", e => { if (drag) { tRotY = drag.ry + (e.clientX - drag.x) * .006; tRotX = Math.max(-.6, Math.min(.6, drag.rx + (e.clientY - drag.y) * .004)); } else if (!reduced) { const r = wrap.getBoundingClientRect(); tRotY = -.35 + ((e.clientX - r.left) / r.width - .5) * .5; tRotX = .12 + ((e.clientY - r.top) / r.height - .5) * .3; } });
+  wrap.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY, ry: tRotY, rx: tRotX }; auto = false; });
+  addEventListener("pointerup", () => drag = null);
+  function project(p, t) {
+    const cy = Math.cos(rotY), sy = Math.sin(rotY), cx = Math.cos(rotX), sx = Math.sin(rotX);
+    let x = p.x * cy + p.z * sy, z = -p.x * sy + p.z * cy, y = p.y * cx - z * sx; z = p.y * sx + z * cx;
+    const f = 2.6 / (2.6 + z), S = Math.min(W, H) * .42;
+    return { X: W / 2 + x * f * S, Y: H / 2 + y * f * S * -1, z, f };
+  }
+  function buildNeurons() {
+    const box = $("#neurons"); box.innerHTML = C().stops.map((s, i) => `<a class="neuron" data-i="${i}" href="index.html#${s.id}"><span class="disc"><img src="assets/logos/${s.logo}" alt="${s.name}"></span><span class="lbl"><b>${s.name}</b><span>${s.years}</span></span></a>`).join("");
+    const tip = $("#tip");
+    $$(".neuron").forEach(el => { el.addEventListener("pointerenter", () => { const s = C().stops[+el.dataset.i]; $("#tipK").textContent = s.kicker; $("#tipT").textContent = s.lead; tip.style.left = el.style.left; tip.style.top = `calc(${el.style.top} - 44px)`; tip.classList.add("show"); });
+      el.addEventListener("pointerleave", () => tip.classList.remove("show")); });
+  }
+  let t0 = null;
+  function frame(now) {
+    if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
+    if (auto && !drag && !reduced) tRotY += .0008;
+    rotY += (tRotY - rotY) * .06; rotX += (tRotX - rotX) * .06;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    const P = pts.map(p => project(p));
+    // edges
+    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = .05 + (1 - (d + 1) / 2) * .22; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
+    // points
+    for (let i = 0; i < N; i++) { const p = P[i], al = .25 + (1 - (p.z + 1) / 2) * .6, r = pts[i].s * p.f; ctx.fillStyle = `rgba(200,214,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
+    // neuron chain + signal
+    const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
+    ctx.lineWidth = 1.6; ctx.strokeStyle = "rgba(46,230,197,.55)"; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
+    for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
+    if (!reduced && A.length > 1) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
+      const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
+      ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
+    // place neurons
+    $$(".neuron").forEach((el, i) => { const a = A[i]; el.style.left = a.X + "px"; el.style.top = a.Y + "px"; const s = .72 + (1 - (a.z + 1) / 2) * .5; el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`; el.style.opacity = (.55 + (1 - (a.z + 1) / 2) * .45).toFixed(2); el.style.zIndex = Math.round((1 - a.z) * 10) + 2; });
+    requestAnimationFrame(frame);
+  }
+  render(); requestAnimationFrame(frame);
+})();
+</script>
+<script src="counter.js" defer></script>
+</body></html>
