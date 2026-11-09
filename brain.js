@@ -86,7 +86,8 @@
   function size() { W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; fit(); }
   size(); addEventListener("resize", () => size());
   wrap.addEventListener("pointermove", e => { if (focus !== null) return; if (drag) { tRotY = drag.ry + (e.clientX - drag.x) * .006; tRotX = Math.max(-.6, Math.min(.6, drag.rx + (e.clientY - drag.y) * .004)); } else if (!reduced) { const r = wrap.getBoundingClientRect(); tRotY = -.35 + ((e.clientX - r.left) / r.width - .5) * .3; tRotX = .12 + ((e.clientY - r.top) / r.height - .5) * .3; } });
-  let hover = false; wrap.addEventListener("pointerenter", () => hover = true); wrap.addEventListener("pointerleave", () => hover = false);
+  let hover = false, px = -1e4, py = -1e4; wrap.addEventListener("pointerenter", () => hover = true); wrap.addEventListener("pointerleave", () => { hover = false; px = py = -1e4; });
+  wrap.addEventListener("pointermove", e => { const r = wrap.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top; });
   wrap.addEventListener("pointerdown", e => { if (focus === null && e.target === cv) { drag = { x: e.clientX, y: e.clientY, ry: tRotY, rx: tRotX }; auto = false; } });
   addEventListener("pointerup", () => drag = null);
   cv.addEventListener("click", () => { if (focus !== null) unfocus(); });
@@ -94,11 +95,19 @@
   function projStem(p) { const cy = Math.cos(rotY), sy = Math.sin(rotY); const x = p.x * cy + p.z * sy, z = -p.x * sy + p.z * cy, f = FOCAL / (FOCAL + z), S = baseS * zoom;
     return { X: cX + x * f * S + offX, Y: cY - p.y * f * S + offY, z, f }; }
   // material shared by brain and column
-  function drawCloud(ctx, P, pts, edges, from, to, alpha, fireAt) {
-    for (const [a, b] of edges) { if (a < from || a >= to || b < from || b >= to) continue; const p = P[a - from], q = P[b - from]; if (!p || !q) continue; const d = (p.z + q.z) / 2, al = (.07 + (1 - (d + 1) / 2) * .34) * alpha(a) ; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
-    for (let i = from; i < to; i++) { const p = P[i - from]; if (!p) continue; const depth = 1 - (p.z + 1) / 2, fire = fireAt ? fireAt(i) : 0, al = Math.min(1, (.3 + depth * .65) * alpha(i) + fire * .6), r = pts[i].sz * p.f * (1 + fire * .8);
-      ctx.fillStyle = fire > 0 ? `rgba(46,230,197,${(al * .3).toFixed(3)})` : `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
-      ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
+  function drawCloud(ctx, P, pts, edges, from, to, alpha, fireAt, stim, t) {
+    const st = stim ? (x, y) => { const d = Math.hypot(x - stim.X, y - stim.Y); return d > stim.R ? 0 : Math.pow(1 - d / stim.R, 1.5) * (.8 + .2 * Math.sin(t * 18 + x * .05 + y * .07)); } : () => 0;
+    for (const [a, b] of edges) { if (a < from || a >= to || b < from || b >= to) continue; const p = P[a - from], q = P[b - from]; if (!p || !q) continue; const d = (p.z + q.z) / 2, k = st((p.X + q.X) / 2, (p.Y + q.Y) / 2), al = (.07 + (1 - (d + 1) / 2) * .34) * alpha(a) + k * .5;
+      ctx.strokeStyle = k > 0 ? `rgba(${Math.round(124 + 131 * k)},${Math.round(156 - 90 * k)},${Math.round(255 - 175 * k)},${al.toFixed(3)})` : `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8 + k * .6; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
+    for (let i = from; i < to; i++) { const p = P[i - from]; if (!p) continue; const depth = 1 - (p.z + 1) / 2, fire = fireAt ? fireAt(i) : 0, k = st(p.X, p.Y), al = Math.min(1, (.3 + depth * .65) * alpha(i) + fire * .6 + k * .5), r = pts[i].sz * p.f * (1 + fire * .8 + k * 1.1);
+      ctx.fillStyle = k > 0 ? `rgba(255,70,60,${(al * .35 * k + .04).toFixed(3)})` : fire > 0 ? `rgba(46,230,197,${(al * .3).toFixed(3)})` : `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
+      ctx.fillStyle = k > 0 ? `rgba(${Math.round(214 + 41 * k)},${Math.round(226 - 140 * k)},${Math.round(255 - 170 * k)},${al.toFixed(3)})` : `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
+  }
+  // the probe itself: a hot red core with a soft halo, drawn where the pointer is
+  function drawProbe(ctx, X, Y, R, t) {
+    const g = ctx.createRadialGradient(X, Y, 0, X, Y, R); g.addColorStop(0, "rgba(255,80,70,.26)"); g.addColorStop(.45, "rgba(255,60,60,.08)"); g.addColorStop(1, "rgba(255,60,60,0)"); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(X, Y, R, 0, 6.283); ctx.fill();
+    ctx.save(); ctx.shadowColor = "rgba(255,90,80,1)"; ctx.shadowBlur = 18 + 6 * Math.sin(t * 9); ctx.fillStyle = "rgba(255,230,225,.95)"; ctx.beginPath(); ctx.arc(X, Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore();
+    ctx.strokeStyle = "rgba(255,110,100,.45)"; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(X, Y, 10 + 3 * Math.sin(t * 6), 0, 6.283); ctx.stroke();
   }
   function project(p, raw) {
     const cy = Math.cos(rotY), sy = Math.sin(rotY), cx = Math.cos(rotX), sx = Math.sin(rotX);
@@ -204,7 +213,7 @@
       ${imgs.length ? `<div class="hd-imgs">${imgs.map(i => `<img src="assets/img/${i}" alt="" data-full="assets/img/${i}">`).join("")}</div>` : ""}
       ${k.blur ? `<span class="eyebrow">${esc(u.blur_note)}</span>` : ""}${k.link ? `<a class="btn" target="_blank" rel="noopener" href="${esc(k.link)}">${esc(u.g_verify)} ↗</a>` : ""}`;
     d.classList.add("on"); $(".hd-close", d).onclick = () => { d.innerHTML = `<p class="holo-empty">${esc(u.v3_pick)}</p>`; $$(".sat, .chip").forEach(x => x.classList.remove("on")); };
-    $$(".hd-imgs img", d).forEach(im => im.onclick = () => { const lb = $("#lightbox"); if (lb) { $("img", lb).src = im.dataset.full; lb.classList.add("open"); lb.onclick = () => lb.classList.remove("open"); } });
+    /* panel images open in the proof viewer (gallery.js, delegated) */
   }
 
   /* ---- render loop ---- */
@@ -224,10 +233,8 @@
     offX += (tOffX - offX) * .08; offY += (tOffY - offY) * .08;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .95 : 1, P = pts.map(p => project(p));
-    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.07 + (1 - (d + 1) / 2) * .34) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
-    for (let i = 0; i < N; i++) { const p = P[i], depth = 1 - (p.z + 1) / 2, al = (.3 + depth * .65) * dim, r = pts[i].s * p.f * Math.sqrt(zoom);
-      ctx.fillStyle = `rgba(124,156,255,${(al * .18).toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r * 3.2, 0, 6.283); ctx.fill();
-      ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
+    const stim = (hover && focus === null && px > -1e3) ? { X: px, Y: py, R: 95 } : null;
+    drawCloud(ctx, P, pts.map(q => ({ sz: q.s * Math.sqrt(zoom) })), edges, 0, N, () => dim, null, stim, t);
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
     for (let i = 1; i < A.length; i++) { const p = A[i - 1], q = A[i], cx = (p.X + q.X) / 2; ctx.bezierCurveTo(cx, p.Y, cx, q.Y, q.X, q.Y); } ctx.stroke(); ctx.shadowBlur = 0;
@@ -235,11 +242,12 @@
       const sMax = Math.max(0, (H + 30 - cY) / (baseS * zoom) + STEM.top) + .3; let to = 0; while (to < stemPts.length && stemPts[to].s < sMax) to++; stemTo = to;
       const P = []; for (let i = 0; i < to; i++) P.push(projStem(stemPoint(stemPts[i])));
       const sig = sigS(t);
-      drawCloud(ctx, P, stemPts, stemEdges, 0, to, () => 1, i => Math.max(0, 1 - Math.abs(stemPts[i].s - sig) / .14));
+      drawCloud(ctx, P, stemPts, stemEdges, 0, to, () => 1, i => Math.max(0, 1 - Math.abs(stemPts[i].s - sig) / .14), stim, t);
       // the neural link continues down the column as its cord
       ctx.save(); ctx.lineWidth = 1.6; ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath();
       for (let ss = 0, first = true; ss <= sMax; ss += .2) { const a = axisAt(ss), q = projStem({ x: a.x, y: STEM.top - ss, z: a.z }); first ? ctx.moveTo(q.X, q.Y) : ctx.lineTo(q.X, q.Y); first = false; } ctx.stroke(); ctx.restore();
       if (!reduced && sig < sMax) { const a = axisAt(sig), q = projStem({ x: a.x, y: STEM.top - sig, z: a.z }); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); } }
+    if (stim) drawProbe(ctx, stim.X, stim.Y, stim.R, t);
     if (!reduced && focus === null) { const k = (((t * .18) % 1) + 1) % 1, total = A.length - 1, seg = Math.max(0, Math.min(total - 1, Math.floor(k * total))), u = Math.min(1, k * total - seg), p = A[seg], q = A[seg + 1], cx = (p.X + q.X) / 2;
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
@@ -252,7 +260,7 @@
     requestAnimationFrame(frame);
   }
   let stemTo = 0; const sigS = t => reduced ? -9 : (t * 1.25) % 9.5;
-  window.BrainInfo = () => { const r = wrap.getBoundingClientRect(); return { S: baseS * zoom, rect: r, cY, x: r.left + cX + offX, STEM, pts: stemPts, edges: stemEdges, point: stemPoint, proj: projStem, axisAt, draw: drawCloud, sigS, resting: focus === null && !wrap.classList.contains("focused") }; };
+  window.BrainInfo = () => { const r = wrap.getBoundingClientRect(); return { S: baseS * zoom, rect: r, cY, probe: drawProbe, x: r.left + cX + offX, STEM, pts: stemPts, edges: stemEdges, point: stemPoint, proj: projStem, axisAt, draw: drawCloud, sigS, resting: focus === null && !wrap.classList.contains("focused") }; };
   window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); const g = $("#hlghost"); if (g) g.textContent = C().headlines.reduce((m, x) => x.length > m.length ? x : m, ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
   requestAnimationFrame(frame);
 })();

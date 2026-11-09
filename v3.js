@@ -145,10 +145,7 @@
   addEventListener("scroll", onScroll, { passive: true });
 
   function bindLightbox() {
-    const lb = $("#lightbox"), img = $("img", lb);
-    $$(".fig").forEach(f => f.addEventListener("click", () => { img.src = f.dataset.full; lb.classList.add("open"); }));
-    lb.onclick = () => lb.classList.remove("open");
-    addEventListener("keydown", e => e.key === "Escape" && lb.classList.remove("open"));
+    /* proof thumbnails are handled by gallery.js (delegated click) */
   }
   const tick = () => { $("#clock").textContent = new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Istanbul" }).format(new Date()) + " IST"; };
   tick(); setInterval(tick, 20000);

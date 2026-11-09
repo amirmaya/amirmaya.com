@@ -181,3 +181,37 @@ h1{position:relative;font-size:clamp(22px,min(2.2vw,3.4vh),34px);line-height:1.0
 .hd-imgs img{border-radius:8px}.fig,.tool,.card{overflow:hidden}
 .stats>div:first-child{border-radius:var(--r) 0 0 var(--r)}.stats>div:last-child{border-radius:0 var(--r) var(--r) 0}
 .photo,.biglogo,.brand-mark,.neuron .disc,.sat .sd,.chip .sd,.intern .lg,.edu-item .lg{border-radius:50%}
+/* ===== fluidity: one motion vocabulary everywhere ===== */
+:root{--ease:var(--e)}
+html{scroll-padding-top:84px}
+.btn,.card,.fig,.tool,.neuron .disc,.sat .sd,.chip,.dir a,.seg button,.hud,.duty,.stats>div,.edu-item,.skill,.intern,.small{transition:transform var(--t) var(--e),box-shadow var(--t) var(--e),border-color var(--t) var(--e),background var(--t) var(--e),color var(--t) var(--e),opacity var(--t) var(--e),filter var(--t) var(--e)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 0 22px -8px rgba(46,230,197,.7)}.btn-ink:hover{box-shadow:0 0 26px -6px rgba(46,230,197,.8)}
+.dir a:hover,.dir a.active{border-color:transparent;color:var(--accent)}.dir a{position:relative}.dir a::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:1px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform var(--t) var(--e)}.dir a:hover::after,.dir a.active::after{transform:scaleX(1)}
+.card:hover{box-shadow:0 0 0 1px rgba(46,230,197,.5) inset,0 24px 50px -30px rgba(46,230,197,.35);transform:translateY(-3px)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
+.section{border-bottom:0;position:relative}.section::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--line) 15%,rgba(46,230,197,.35) 50%,var(--line) 85%,transparent)}
+.reveal{transition:opacity .9s var(--e) var(--rd,0s),transform .9s var(--e) var(--rd,0s)}
+/* ===== proofs: thumbnails are one quiet family; caption floats on glass; "inspect" pill appears on hover ===== */
+.fig{background:#0b0f19;border:1px solid var(--line)}.fig .img{border-bottom:0;aspect-ratio:3/4}.press .fig .img,.press .fig:first-child .img{aspect-ratio:3/4}.awards .fig .img{aspect-ratio:4/3}.apps .fig .img{aspect-ratio:9/16}
+.fig img{filter:saturate(.75) brightness(.9)}.fig:hover img{filter:none;transform:scale(1.05)}
+.fig .cap2{position:absolute;left:0;right:0;bottom:0;padding:26px 12px 11px;background:linear-gradient(180deg,rgba(7,9,15,0),rgba(7,9,15,.85) 55%);pointer-events:none}
+.fig::after{content:"⤢";position:absolute;right:10px;top:10px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(7,9,15,.7);border:1px solid rgba(46,230,197,.5);color:var(--accent);font-size:13px;opacity:0;transform:translateY(-6px);transition:opacity var(--t) var(--e),transform var(--t) var(--e);backdrop-filter:blur(6px)}
+.fig:hover::after,.tool .shot:hover::after{opacity:1;transform:none}
+.tool .shot{cursor:zoom-in}.tool .shot::after{content:"⤢";position:absolute;right:12px;bottom:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(7,9,15,.7);border:1px solid rgba(46,230,197,.5);color:var(--accent);font-size:13px;opacity:0;transform:translateY(6px);transition:opacity var(--t) var(--e),transform var(--t) var(--e);z-index:2}
+.tool .shot .lock{border-radius:999px;background:rgba(7,9,15,.75);color:var(--ink2);border:1px solid var(--line);backdrop-filter:blur(6px)}
+.gal-src{visibility:hidden}
+/* ===== proof viewer ===== */
+.gal{position:fixed;inset:0;z-index:120;display:grid;place-items:center;pointer-events:none;opacity:0;transition:opacity .35s var(--e)}.gal.on{pointer-events:auto;opacity:1}
+.gal-bg{position:absolute;inset:0;background:radial-gradient(1100px 800px at 50% 50%,rgba(15,24,48,.94),rgba(7,9,15,.97));backdrop-filter:blur(10px);cursor:zoom-out}
+.gal-frame{position:relative;max-width:86vw;max-height:80vh;border:1px solid rgba(46,230,197,.45);background:#0b0f19;box-shadow:0 0 0 1px rgba(46,230,197,.08),0 40px 120px -40px rgba(46,230,197,.45);overflow:hidden;border-radius:var(--r);transition:transform .5s var(--e),opacity .5s var(--e),width .35s var(--e),height .35s var(--e);cursor:zoom-in;opacity:0;transform:scale(.96)}
+.gal-frame.ready{opacity:1;transform:none}.gal-frame.zoom{cursor:zoom-out}
+.gal-frame img{display:block;width:100%;height:100%;object-fit:contain;transition:transform .45s var(--e);transform-origin:50% 50%}.gal-frame.zoom img{transform:scale(2.2)}
+.gal-c{position:absolute;width:18px;height:18px;border:2px solid var(--accent);z-index:2;pointer-events:none}.gal-c.tl{left:-1px;top:-1px;border-right:0;border-bottom:0;border-radius:var(--r) 0 0 0}.gal-c.tr{right:-1px;top:-1px;border-left:0;border-bottom:0;border-radius:0 var(--r) 0 0}.gal-c.bl{left:-1px;bottom:-1px;border-right:0;border-top:0;border-radius:0 0 0 var(--r)}.gal-c.br{right:-1px;bottom:-1px;border-left:0;border-top:0;border-radius:0 0 var(--r) 0}
+.gal-cap{position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);display:flex;align-items:baseline;gap:14px;padding:10px 18px;border:1px solid var(--line);border-radius:999px;background:rgba(7,9,15,.7);backdrop-filter:blur(8px);white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.gal-cap .eyebrow{color:var(--accent)}.gal-cap b{color:var(--ink);font-size:14px}.gal-cap .gal-n{color:var(--muted);font-size:11px;letter-spacing:.08em}
+.gal.blur .gal-cap::after{content:"· blurred on purpose";color:var(--muted);font:500 11px var(--mono);letter-spacing:.06em}
+.gal-btn{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(7,9,15,.7);color:var(--ink);font:600 16px var(--mono);cursor:pointer;backdrop-filter:blur(8px);display:none;transition:border-color var(--t) var(--e),box-shadow var(--t) var(--e),transform var(--t) var(--e)}
+.gal-btn:hover{border-color:var(--accent);box-shadow:0 0 20px -6px rgba(46,230,197,.8)}.gal.multi .gal-prev,.gal.multi .gal-next{display:grid;place-items:center}.gal-prev{left:3vw}.gal-next{right:3vw}
+.gal-x{display:grid;place-items:center;top:22px;right:24px;transform:none}
+body.gal-open{overflow:hidden}
+@media (max-width:620px){.gal-prev{left:8px}.gal-next{right:8px}.gal-cap{bottom:2vh;padding:8px 14px}}

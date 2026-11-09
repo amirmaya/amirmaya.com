@@ -6,7 +6,7 @@
   if (!cv || !sec || !list || !window.BrainInfo) return;
   const ctx = cv.getContext("2d"), dpr = Math.min(2, devicePixelRatio || 1), reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   let W = 0, H = 0; const size = () => { W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; }; size(); addEventListener("resize", size);
-  const flash = new Map();
+  const flash = new Map(); let mx = -1e4, my = -1e4; addEventListener("pointermove", e => { mx = e.clientX; my = e.clientY; }, { passive: true }); addEventListener("pointerleave", () => { mx = my = -1e4; });
   function frame(now) {
     requestAnimationFrame(frame); if (document.hidden) return;
     const t = now / 1000, sr = sec.getBoundingClientRect(), cr = cv.getBoundingClientRect();
@@ -23,7 +23,9 @@
     const taper = s => Math.max(0, Math.min(1, (sEnd - s) / 1.4));
     const P = []; for (let i = from; i < to; i++) { const p = pts[i], tp = taper(p.s); P.push(toV(B.proj(B.point(p, .15 + .85 * tp)))); }
     const sig = B.sigS(t);
-    B.draw(ctx, P, pts, B.edges, from, to, i => (pts[i].s < s0 - .25 ? 0 : 1) * (.25 + .75 * taper(pts[i].s)), i => Math.max(0, 1 - Math.abs(pts[i].s - sig) / .14) * taper(pts[i].s));
+    // the probe only wakes up near the column (the canvas sits under the text too)
+    const nearCol = Math.abs(mx - B.x) < 150 && my > sr.top && my < lr.bottom, stim = nearCol ? { X: mx, Y: my, R: 95 } : null;
+    B.draw(ctx, P, pts, B.edges, from, to, i => (pts[i].s < s0 - .25 ? 0 : 1) * (.25 + .75 * taper(pts[i].s)), i => Math.max(0, 1 - Math.abs(pts[i].s - sig) / .14) * taper(pts[i].s), stim, t);
     // cord: the neural link, fading out with the column
     ctx.save(); ctx.lineWidth = 1.6; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10;
     const cs = Math.max(0, s0 - .2), ce = Math.min(sEnd, s1 + .2), a0 = B.axisAt(cs), q0 = toV(B.proj({ x: a0.x, y: B.STEM.top - cs, z: a0.z })), a1 = B.axisAt(ce), q1 = toV(B.proj({ x: a1.x, y: B.STEM.top - ce, z: a1.z }));
@@ -40,6 +42,7 @@
       pts2.forEach((q, i) => { const al = (.35 + .4 * (1 - i / n)) * base + f * .5, rr = (.7 + (1 - i / n) * .9) * (1 + f * .8); ctx.fillStyle = `rgba(124,156,255,${(al * .2).toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr * 3, 0, 6.283); ctx.fill(); ctx.fillStyle = `rgba(214,226,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(q.X, q.Y, rr, 0, 6.283); ctx.fill(); });
       if (f > 0) { const u = 1 - f, X = x1 + (x2 - x1) * u, Y = yc + Math.sin(u * 3.1416) * 7 - u * 2; ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18 * f; ctx.fillStyle = `rgba(220,255,247,${(.95 * f).toFixed(2)})`; ctx.beginPath(); ctx.arc(X, Y, 2.4, 0, 6.283); ctx.fill(); ctx.restore(); }
     }
+    if (stim) B.probe(ctx, stim.X, stim.Y, stim.R, t);
     // the signal on the cord
     if (!reduced && sig > s0 && sig < Math.min(s1, sEnd)) { const a = B.axisAt(sig), q = toV(B.proj({ x: a.x, y: B.STEM.top - sig, z: a.z })); ctx.save(); ctx.shadowColor = "rgba(46,230,197,1)"; ctx.shadowBlur = 18; ctx.fillStyle = "rgba(220,255,247,.95)"; ctx.beginPath(); ctx.arc(q.X, q.Y, 2.6, 0, 6.283); ctx.fill(); ctx.restore(); }
   }
