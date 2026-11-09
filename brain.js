@@ -50,7 +50,7 @@
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
   function size() { W = wrap.clientWidth; H = wrap.clientHeight; cv.width = W * dpr; cv.height = H * dpr; }
-  size(); addEventListener("resize", () => { size(); if (focus !== null) placeHolo(); });
+  size(); addEventListener("resize", () => size());
   wrap.addEventListener("pointermove", e => { if (focus !== null) return; if (drag) { tRotY = drag.ry + (e.clientX - drag.x) * .006; tRotX = Math.max(-.6, Math.min(.6, drag.rx + (e.clientY - drag.y) * .004)); } else if (!reduced) { const r = wrap.getBoundingClientRect(); tRotY = -.35 + ((e.clientX - r.left) / r.width - .5) * .5; tRotX = .12 + ((e.clientY - r.top) / r.height - .5) * .3; } });
   wrap.addEventListener("pointerdown", e => { if (focus === null && e.target === cv) { drag = { x: e.clientX, y: e.clientY, ry: tRotY, rx: tRotX }; auto = false; } });
   addEventListener("pointerup", () => drag = null);
@@ -74,40 +74,52 @@
     });
   }
 
-  /* ---- focus / hologram ---- */
+  /* ---- focus: full-screen takeover + ordered hologram panel ---- */
+  let placeholder = null;
+  function expand() {
+    const r = wrap.getBoundingClientRect(); placeholder = document.createElement("div"); placeholder.style.height = r.height + "px"; wrap.parentNode.insertBefore(placeholder, wrap);
+    wrap.classList.add("focused"); document.body.classList.add("brain-open");
+    const vw = innerWidth, vh = innerHeight, sx = r.width / vw, sy = r.height / vh;
+    wrap.style.transition = "none"; wrap.style.transform = `translate(${r.left}px,${r.top}px) scale(${sx},${sy})`; wrap.style.transformOrigin = "0 0";
+    requestAnimationFrame(() => { wrap.style.transition = "transform .7s cubic-bezier(.2,.7,.2,1)"; wrap.style.transform = "translate(0,0) scale(1,1)"; });
+    setTimeout(() => { size(); }, 50); setTimeout(() => { size(); placePanel(); }, 720);
+  }
+  function collapse() {
+    if (!placeholder) return; const r = placeholder.getBoundingClientRect(); const sx = r.width / innerWidth, sy = r.height / innerHeight;
+    wrap.style.transition = "transform .6s cubic-bezier(.2,.7,.2,1)"; wrap.style.transform = `translate(${r.left}px,${r.top}px) scale(${sx},${sy})`;
+    setTimeout(() => { wrap.classList.remove("focused"); document.body.classList.remove("brain-open"); wrap.style.transform = ""; wrap.style.transition = ""; placeholder.remove(); placeholder = null; size(); }, 600);
+  }
   function focusOn(i) {
-    focus = i; auto = false; $("#tip").classList.remove("show"); wrap.classList.add("focused");
-    const a = anchors[i]; tRotY = Math.atan2(a[0], -a[2]) * .85; tRotX = -.08 + a[1] * .25; tZoom = Math.min(1.9, Math.max(1.5, (Math.min(W, H) / 420)));
-    const s = C().stops[i], kids = childrenOf(s.id), u = ui();
-    const holo = $("#holo"); holo.innerHTML = `
-      <div class="holo-head"><span class="eyebrow">${esc(s.kicker)}</span><h3>${esc(s.name)}</h3><p>${esc(s.lead)}</p>
-        <div class="holo-acts"><a class="btn btn-ink" href="#${s.id}" data-read>${esc(u.g_read)} ↓</a><button class="btn" data-back>${esc(u.v3_back)}</button></div></div>
-      ${kids.length ? kids.map((k, j) => `<button class="holo-card" style="--d:${120 + j * 70}ms" data-j="${j}">${k.img ? `<img class="hc-img" src="assets/img/${k.img}" alt="">` : `<img class="hc-ico" src="assets/logos/${k.logo}" alt="">`}<span class="hc-k">${esc(k.k)}</span><b class="hc-t">${esc(k.t)}</b></button>`).join("") : `<p class="holo-none eyebrow">${esc(u.v3_none)}</p>`}
-      <div class="holo-detail" id="holoDetail"></div>`;
+    if (focus === null) expand();
+    focus = i; auto = false; $("#tip").classList.remove("show");
+    const a = anchors[i]; tRotY = Math.atan2(a[0], -a[2]) * .85; tRotX = -.1 + a[1] * .3; tZoom = 2.1;
+    const s = C().stops[i], kids = childrenOf(s.id), u = ui(), holo = $("#holo");
+    holo.innerHTML = `<button class="holo-close btn" data-back>✕ ${esc(u.v3_back)}</button>
+      <div class="holo-panel">
+        <div class="holo-head"><span class="eyebrow">${esc(s.kicker)}</span><h3>${esc(s.name)} <span class="mono">${esc(s.years)}</span></h3><p>${esc(s.lead)}</p>
+          <div class="holo-acts"><a class="btn btn-ink" href="#${s.id}" data-read>${esc(u.g_read)} ↓</a></div></div>
+        <div class="holo-grid">${kids.length ? kids.map((k, j) => `<button class="holo-card" style="--d:${260 + j * 60}ms" data-j="${j}">${k.img ? `<img class="hc-img" src="assets/img/${k.img}" alt="">` : `<img class="hc-ico" src="assets/logos/${k.logo}" alt="">`}<span><span class="hc-k">${esc(k.k)}</span><b class="hc-t">${esc(k.t)}</b></span></button>`).join("") : `<p class="eyebrow">${esc(u.v3_none)}</p>`}</div>
+        <div class="holo-detail" id="holoDetail"></div>
+        <nav class="holo-nav">${C().stops.map((x, j) => `<button class="hn ${j === i ? "on" : ""}" data-n="${j}" title="${esc(x.name)}"><img src="assets/logos/${x.logo}" alt=""></button>`).join("")}</nav>
+      </div>`;
     holo.classList.add("on");
     $("[data-back]", holo).onclick = unfocus;
-    $("[data-read]", holo).onclick = e => { e.preventDefault(); unfocus(); setTimeout(() => $("#" + s.id).scrollIntoView({ behavior: reduced ? "auto" : "smooth" }), 250); };
-    $$(".holo-card").forEach(b => b.onclick = () => showDetail(kids[+b.dataset.j], b));
-    requestAnimationFrame(placeHolo);
+    $("[data-read]", holo).onclick = ev => { ev.preventDefault(); unfocus(); setTimeout(() => $("#" + s.id).scrollIntoView({ behavior: reduced ? "auto" : "smooth" }), 650); };
+    $$(".holo-card", holo).forEach(btn => btn.onclick = () => showDetail(kids[+btn.dataset.j], btn));
+    $$(".hn", holo).forEach(btn => btn.onclick = () => focusOn(+btn.dataset.n));
+    placePanel();
   }
-  function unfocus() { focus = null; tZoom = 1; tOffX = tOffY = 0; tRotY = -.35; tRotX = .12; wrap.classList.remove("focused"); $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; }
-  function placeHolo() {
-    if (focus === null) return; const cards = $$(".holo-card"), n = cards.length; if (!n) return;
-    const a = project({ x: anchors[focus][0], y: anchors[focus][1], z: anchors[focus][2] });
-    // cards fan on the side away from the neuron: neuron sits at ~38% width → fan to the right
-    const Rr = Math.min(W * .34, 300), a0 = -78, a1 = 78;
-    cards.forEach((c, j) => { const t = n === 1 ? .5 : j / (n - 1), ang = (a0 + (a1 - a0) * t) * Math.PI / 180; const x = a.X + Math.cos(ang) * Rr * 1.15, y = a.Y + Math.sin(ang) * Rr * .95;
-      const cw = c.offsetWidth || 150, ch = c.offsetHeight || 60; c.style.left = Math.min(W - cw - 6, Math.max(6, x - 8)) + "px"; c.style.top = Math.min(H - ch - 6, Math.max(6, y - ch / 2)) + "px"; });
-    const head = $(".holo-head"); if (head) { head.style.left = "14px"; head.style.top = "14px"; }
-  }
+  function unfocus() { if (focus === null) return; focus = null; tZoom = 1; tOffX = tOffY = 0; tRotY = -.35; tRotX = .12; $("#holo").classList.remove("on"); $("#holo").innerHTML = ""; collapse(); }
+  function placePanel() { /* panel is CSS-positioned; nothing dynamic */ }
+  const placeHolo = placePanel;
   function showDetail(k, btn) {
-    const d = $("#holoDetail"), u = ui(); $$(".holo-card").forEach(b => b.classList.toggle("sel", b === btn));
+    const d = $("#holoDetail"), u = ui(); $$(".holo-card").forEach(x => x.classList.toggle("sel", x === btn));
     const imgs = k.imgs || (k.img ? [k.img] : []);
     d.innerHTML = `<button class="hd-close" aria-label="Close">×</button><span class="eyebrow">${esc(k.k)}</span><b>${esc(k.t)}</b><p>${esc(k.d || "")}</p>
-      ${k.list ? `<ul>${k.list.map(([a, b]) => `<li><b>${esc(a)}</b> ${esc(b)}</li>`).join("")}</ul>` : ""}
+      ${k.list ? `<ul>${k.list.map(([a, b2]) => `<li><b>${esc(a)}</b> ${esc(b2)}</li>`).join("")}</ul>` : ""}
       ${imgs.length ? `<div class="hd-imgs">${imgs.map(i => `<img src="assets/img/${i}" alt="" data-full="assets/img/${i}">`).join("")}</div>` : ""}
       ${k.blur ? `<span class="eyebrow">${esc(u.blur_note)}</span>` : ""}${k.link ? `<a class="btn" target="_blank" rel="noopener" href="${esc(k.link)}">${esc(u.g_verify)} ↗</a>` : ""}`;
-    d.classList.add("on"); $(".hd-close", d).onclick = () => { d.classList.remove("on"); $$(".holo-card").forEach(b => b.classList.remove("sel")); };
+    d.classList.add("on"); $(".hd-close", d).onclick = () => { d.classList.remove("on"); $$(".holo-card").forEach(x => x.classList.remove("sel")); };
     $$(".hd-imgs img", d).forEach(im => im.onclick = () => { const lb = $("#lightbox"); if (lb) { $("img", lb).src = im.dataset.full; lb.classList.add("open"); lb.onclick = () => lb.classList.remove("open"); } });
   }
 
@@ -117,7 +129,7 @@
     if (t0 === null) t0 = now; const t = Math.max(0, (now - t0) / 1000);
     if (auto && !drag && !reduced && focus === null) tRotY += .0008;
     rotY += (tRotY - rotY) * .06; rotX += (tRotX - rotX) * .06; zoom += (tZoom - zoom) * .07;
-    if (focus !== null) { const a = project({ x: anchors[focus][0], y: anchors[focus][1], z: anchors[focus][2] }, true); tOffX = W * .36 - a.X; tOffY = H * .5 - a.Y; }
+    if (focus !== null) { const a = project({ x: anchors[focus][0], y: anchors[focus][1], z: anchors[focus][2] }, true); tOffX = W * .27 - a.X; tOffY = H * .52 - a.Y; }
     offX += (tOffX - offX) * .07; offY += (tOffY - offY) * .07;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .55 : 1, P = pts.map(p => project(p));
@@ -130,13 +142,11 @@
       const bx = (1 - u) ** 3 * p.X + 3 * (1 - u) ** 2 * u * cx + 3 * (1 - u) * u * u * cx + u ** 3 * q.X, by = (1 - u) ** 3 * p.Y + 3 * (1 - u) ** 2 * u * p.Y + 3 * (1 - u) * u * u * q.Y + u ** 3 * q.Y;
       ctx.fillStyle = "#2ee6c5"; ctx.shadowColor = "#2ee6c5"; ctx.shadowBlur = 18; ctx.beginPath(); ctx.arc(bx, by, 4, 0, 6.283); ctx.fill(); ctx.shadowBlur = 0; }
     // hologram links
-    if (focus !== null) { const a = A[focus]; ctx.strokeStyle = "rgba(46,230,197,.45)"; ctx.lineWidth = 1; ctx.setLineDash([3, 5]);
-      $$(".holo-card").forEach(c => { const x = c.offsetLeft, y = c.offsetTop + c.offsetHeight / 2; ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(x, y); ctx.stroke(); }); ctx.setLineDash([]);
-      ctx.beginPath(); ctx.arc(a.X, a.Y, 44 * Math.sqrt(zoom), 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${.35 + .25 * Math.sin(t * 3)})`; ctx.lineWidth = 1.5; ctx.stroke(); }
+    if (focus !== null) { const a = A[focus]; const panel = $(".holo-panel"); if (panel) { const pr = panel.getBoundingClientRect(), wr = wrap.getBoundingClientRect(); ctx.strokeStyle = "rgba(46,230,197,.5)"; ctx.lineWidth = 1.2; ctx.setLineDash([4, 6]); ctx.beginPath(); ctx.moveTo(a.X, a.Y); ctx.lineTo(pr.left - wr.left, pr.top - wr.top + 60); ctx.stroke(); ctx.setLineDash([]); }
+      for (let k = 0; k < 2; k++) { const rr = (48 + k * 22) * Math.sqrt(zoom) + 6 * Math.sin(t * 2.4 + k); ctx.beginPath(); ctx.arc(a.X, a.Y, rr, 0, 6.283); ctx.strokeStyle = `rgba(46,230,197,${(.35 - k * .15) + .15 * Math.sin(t * 3 + k)})`; ctx.lineWidth = 1.2; ctx.stroke(); } }
     $$(".neuron").forEach((el, i) => { const a = A[i], depth = 1 - (a.z + 1) / 2; el.style.left = a.X + "px"; el.style.top = a.Y + "px";
-      const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.25 : .55)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
+      const s = (focus === null ? .72 + depth * .5 : (i === focus ? 1.6 : .6)); el.style.transform = `translate(-50%,-50%) scale(${s.toFixed(3)})`;
       el.style.opacity = focus === null ? (.55 + depth * .45).toFixed(2) : (i === focus ? 1 : .18); el.style.zIndex = Math.round(depth * 10) + 2; });
-    if (focus !== null) placeHolo();
     requestAnimationFrame(frame);
   }
   window.BrainRender = () => { const u = ui(); $$("[data-v3]").forEach(el => el.textContent = u[el.dataset.v3] ?? ""); clearInterval(hlTimer); hlIdx = 0; typeLine(); if (!reduced) hlTimer = setInterval(() => { hlIdx++; typeLine(); }, 5600); buildNeurons(); if (focus !== null) unfocus(); };
