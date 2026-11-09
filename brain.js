@@ -30,17 +30,22 @@
 
   /* ---- point cloud ---- */
   const cv = $("#cv"), ctx = cv.getContext("2d"), wrap = $("#brain"); let W, H, dpr = Math.min(2, devicePixelRatio || 1);
-  const N = 520, pts = [], edges = [];
+  const pts = [], edges = [];
   function rnd(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
   const R = rnd(42);
-  for (let i = 0; i < N; i++) {
-    const u = R() * Math.PI * 2, v = Math.acos(2 * R() - 1), side = R() < .5 ? -1 : 1;
-    let x = Math.sin(v) * Math.cos(u) * .62, y = Math.cos(v) * .78, z = Math.sin(v) * Math.sin(u) * .95;
-    x = x * (1 - Math.abs(y) * .15) + side * .3; if (y < -.35) y = -.35 - (y + .35) * .35; if (z < -.55 && y < 0) y -= .18;
-    const n = (R() - .5) * .06; pts.push({ x: x + n, y: y + n, z: z + n, s: .6 + R() * 1.1 });
-  }
-  for (let i = 0; i < N; i++) { const d = []; for (let j = 0; j < N; j++) if (j !== i) { const p = pts[i], q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); } d.sort((a, b) => a[0] - b[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
-  const anchors = [[-.72, .05, .45], [-.38, .62, .2], [.02, .34, .78], [.42, .66, .15], [.76, .1, .4]];
+  // Anatomy: two hemispheres (long front→back, z axis), a fissure between them, cerebellum at the back-bottom, brainstem below.
+  const hemi = (side, n) => { for (let i = 0; i < n; i++) { const u = R() * 6.2832, v = Math.acos(2 * R() - 1);
+      let x = Math.sin(v) * Math.cos(u), y = Math.cos(v), z = Math.sin(v) * Math.sin(u);
+      // squash into hemisphere: flat inner face at the fissure, flatter base
+      x = Math.abs(x) * .50 + .04; y = y * .64; z = z * .98; if (y < -.25) y = -.25 - (y + .25) * .45; if (z > .6) y -= (z - .6) * .35;   // frontal lobe slopes down
+      const g = .035 * Math.sin(z * 9 + y * 7) * Math.cos(x * 11 + z * 5);                                             // gyri texture
+      pts.push({ x: side * (x + g), y: y + .1 + g, z: z - .05 + g, s: .55 + R() * 1.0 }); } };
+  hemi(-1, 560); hemi(1, 560);
+  for (let i = 0; i < 170; i++) { const u = R() * 6.2832, v = Math.acos(2 * R() - 1); pts.push({ x: Math.sin(v) * Math.cos(u) * .40, y: -.40 + Math.cos(v) * .24, z: -.52 + Math.sin(v) * Math.sin(u) * .30, s: .5 + R() * .8 }); }  // cerebellum
+  for (let i = 0; i < 70; i++) { const a = R() * 6.2832, t = R(); pts.push({ x: Math.cos(a) * .13, y: -.42 - t * .55, z: -.22 + Math.sin(a) * .13 + t * .08, s: .5 + R() * .7 }); }       // brainstem
+  const N = pts.length;
+  for (let i = 0; i < N; i++) { const d = []; const p = pts[i]; for (let j = 0; j < N; j++) if (j !== i) { const q = pts[j]; d.push([(p.x - q.x) ** 2 + (p.y - q.y) ** 2 + (p.z - q.z) ** 2, j]); } d.sort((a, b2) => a[0] - b2[0]); for (let k = 0; k < 3; k++) if (d[k][1] > i) edges.push([i, d[k][1]]); }
+  const anchors = [[-.62, .12, .55], [-.36, .66, .25], [.05, .5, .82], [.40, .68, .1], [.64, .22, .5]];
 
   /* ---- camera ---- */
   let rotY = -.35, rotX = .12, tRotY = rotY, tRotX = rotX, zoom = 1, tZoom = 1, offX = 0, offY = 0, tOffX = 0, tOffY = 0, drag = null, auto = true, focus = null;
@@ -116,7 +121,7 @@
     offX += (tOffX - offX) * .07; offY += (tOffY - offY) * .07;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
     const dim = focus !== null ? .55 : 1, P = pts.map(p => project(p));
-    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.05 + (1 - (d + 1) / 2) * .22) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
+    for (const [a, b] of edges) { const p = P[a], q = P[b], d = (p.z + q.z) / 2, al = (.06 + (1 - (d + 1) / 2) * .26) * dim; ctx.strokeStyle = `rgba(124,156,255,${al.toFixed(3)})`; ctx.lineWidth = .8; ctx.beginPath(); ctx.moveTo(p.X, p.Y); ctx.lineTo(q.X, q.Y); ctx.stroke(); }
     for (let i = 0; i < N; i++) { const p = P[i], al = (.25 + (1 - (p.z + 1) / 2) * .6) * dim, r = pts[i].s * p.f * Math.sqrt(zoom); ctx.fillStyle = `rgba(200,214,255,${al.toFixed(3)})`; ctx.beginPath(); ctx.arc(p.X, p.Y, r, 0, 6.283); ctx.fill(); }
     const A = anchors.map(a => project({ x: a[0], y: a[1], z: a[2] }));
     ctx.lineWidth = 1.6; ctx.strokeStyle = `rgba(46,230,197,${focus === null ? .55 : .25})`; ctx.shadowColor = "rgba(46,230,197,.8)"; ctx.shadowBlur = 10; ctx.beginPath(); ctx.moveTo(A[0].X, A[0].Y);
