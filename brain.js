@@ -90,7 +90,7 @@
   function focusOn(i) {
     if (focus === null) expand();
     focus = i; auto = false; $("#tip").classList.remove("show");
-    const a = anchors[i]; tRotY = Math.atan2(a[0], a[2]); tRotX = Math.max(-.5, Math.min(.5, -a[1] * .6)); tZoom = 2.6;
+    const a = anchors[i]; tRotY = Math.atan2(-a[0], a[2]); const zr = Math.hypot(a[0], a[2]); tRotX = Math.max(-.7, Math.min(.7, Math.atan2(a[1], zr) * .85)); tZoom = 2.4;
     const s = C().stops[i], kids = childrenOf(s.id), u = ui(), holo = $("#holo");
     holo.innerHTML = `<button class="holo-close btn" data-back>✕ ${esc(u.v3_back)}</button>
       <div class="holo-panel">
