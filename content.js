@@ -15,7 +15,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace consultant · builder", where: "Istanbul, Türkiye",
-          tagline: "Welcome in. I'm Amir, a builder and lifelong learner. I built Hype Merch from the ground up and led product, operations, finance and growth; today I work with strategic sellers at Amazon, helping them grow. I care about understanding customers, communicating clearly, and turning ideas into action.",
+          tagline: "Welcome in. I'm Amir. I build things that make businesses move faster: a sneaker marketplace from zero to 200M+ TRY, the internal tools 117 account managers at Amazon work with, and the growth of the biggest Softlines sellers in Turkey. I like understanding customers, cutting workflows down to what matters, and shipping. There is always a better way, and I usually go find it.",
           langs: [["Turkish","Native",100],["English","Native",100],["Hebrew","Intermediate",55],["Spanish","Beginner",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "University of Michigan", d: "Apr 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
@@ -105,7 +105,7 @@ window.CONTENT = {
         ] },
     ],
     me: { name: "Amir Maya", title: "Marketplace danışmanı · builder", where: "İstanbul, Türkiye",
-          tagline: "Hoş geldin. Ben Amir; kuran ve öğrenmeyi bırakmayan biri. Hype Merch'i sıfırdan kurdum; ürün, operasyon, finans ve büyümeyi yönettim. Bugün Amazon'da stratejik satıcılarla çalışıyorum, büyümelerine yardım ediyorum. Müşteriyi anlamak, net iletişim ve fikri eyleme dönüştürmek benim için önemli.",
+          tagline: "Hoş geldin. Ben Amir. İşletmeleri hızlandıran şeyler kurarım: sıfırdan 200M+ TL'ye çıkan bir sneaker marketplace'i, Amazon'da 117 hesap yöneticisinin kullandığı dahili araçlar, Türkiye'nin en büyük Softlines satıcılarının büyümesi. Müşteriyi anlamayı, iş akışlarını özüne indirmeyi ve teslim etmeyi severim. Her zaman daha iyi bir yol vardır; genelde gidip bulurum.",
           langs: [["Türkçe","Ana dil",100],["İngilizce","Ana dil",100],["İbranice","Orta",55],["İspanyolca","Başlangıç",25]],
           certs: [
             { t: "Programming for Everybody (Getting Started with Python)", o: "Michigan Üniversitesi", d: "Nis 2019", u: "https://www.coursera.org/account/accomplishments/verify/CM787GUYJFXD" },
